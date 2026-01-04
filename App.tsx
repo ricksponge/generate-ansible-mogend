@@ -165,7 +165,7 @@ export default function App() {
       <EasterEggModal isOpen={isEasterEggOpen} onClose={() => setIsEasterEggOpen(false)} />
 
       <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <button 
               onClick={() => setIsEasterEggOpen(true)}
@@ -178,20 +178,42 @@ export default function App() {
               <span className="text-[10px] text-slate-500 font-mono uppercase tracking-widest">Forge M472 / SPWSI</span>
             </div>
           </div>
-          <div className="flex items-center space-x-3">
-             <button onClick={() => setIsRptModalOpen(true)} className="flex items-center space-x-2 text-[10px] bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest border border-emerald-500/30 transition-all">
-               <span>📄</span> <span>RPT Tech</span>
+          
+          <div className="flex items-center space-x-3 overflow-x-auto no-scrollbar py-2">
+             <button onClick={() => setIsRptModalOpen(true)} className="flex items-center space-x-3 px-4 py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-2xl transition-all group shrink-0 shadow-sm hover:shadow-emerald-500/10 active:scale-95">
+               <span className="text-xl group-hover:scale-110 transition-transform">📄</span>
+               <div className="text-left">
+                 <div className="text-[9px] font-black text-white uppercase tracking-tighter italic">RPT Technique</div>
+                 <div className="text-[7px] text-slate-500 uppercase tracking-widest font-mono">Export STIG</div>
+               </div>
              </button>
-             <button onClick={() => setIsArchiModalOpen(true)} className="flex items-center space-x-2 text-[10px] bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest border border-indigo-500/30 transition-all">
-               <span>🏗️</span> <span>Architecture</span>
+
+             <button onClick={() => setIsArchiModalOpen(true)} className="flex items-center space-x-3 px-4 py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-2xl transition-all group shrink-0 shadow-sm hover:shadow-indigo-500/10 active:scale-95">
+               <span className="text-xl group-hover:scale-110 transition-transform">🏗️</span>
+               <div className="text-left">
+                 <div className="text-[9px] font-black text-white uppercase tracking-tighter italic">Architecture</div>
+                 <div className="text-[7px] text-slate-500 uppercase tracking-widest font-mono">Flux & Infra</div>
+               </div>
              </button>
-             <button onClick={() => window.open(REPO_DOWNLOAD_URL, '_blank')} className="flex items-center space-x-2 text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest border border-slate-700 transition-all">
-               <span>📥</span> <span>Ansible</span>
+
+             <button onClick={() => window.open(REPO_DOWNLOAD_URL, '_blank')} className="flex items-center space-x-3 px-4 py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-2xl transition-all group shrink-0 shadow-sm hover:shadow-indigo-500/10 active:scale-95">
+               <span className="text-xl group-hover:scale-110 transition-transform">📥</span>
+               <div className="text-left">
+                 <div className="text-[9px] font-black text-white uppercase tracking-tighter italic">Ansible Src</div>
+                 <div className="text-[7px] text-slate-500 uppercase tracking-widest font-mono">Archive .tar.gz</div>
+               </div>
              </button>
-             <button onClick={() => setIsReadmeModalOpen(true)} className="flex items-center space-x-2 text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest border border-slate-700 transition-all">
-               <span>📖</span> <span>Doc</span>
+
+             <button onClick={() => setIsReadmeModalOpen(true)} className="flex items-center space-x-3 px-4 py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-2xl transition-all group shrink-0 shadow-sm hover:shadow-indigo-500/10 active:scale-95">
+               <span className="text-xl group-hover:scale-110 transition-transform">📖</span>
+               <div className="text-left">
+                 <div className="text-[9px] font-black text-white uppercase tracking-tighter italic">Documentation</div>
+                 <div className="text-[7px] text-slate-500 uppercase tracking-widest font-mono">Manuel M472</div>
+               </div>
              </button>
-             <span className="text-[10px] bg-slate-800 text-slate-400 px-2 py-1.5 rounded-lg font-mono border border-slate-700">v3.5</span>
+
+             <div className="w-px h-8 bg-slate-800/50 mx-1 shrink-0"></div>
+             <span className="text-[10px] bg-slate-800/50 text-slate-400 px-3 py-2 rounded-xl font-mono border border-slate-800 italic shrink-0">v3.5</span>
           </div>
         </div>
       </header>

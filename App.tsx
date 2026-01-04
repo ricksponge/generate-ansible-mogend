@@ -177,6 +177,7 @@ export default function App() {
     const newTags = config.tags.includes(tagId) 
       ? config.tags.filter(t => t !== tagId) 
       : [...config.tags, tagId];
+    // On repasse en mode "custom" pour autoriser la surbrillance visuelle
     updateConfig({ tags: newTags, phase: 'custom' });
   };
 
@@ -191,6 +192,9 @@ export default function App() {
       ?
     </button>
   );
+
+  // Détermine si on doit afficher la surbrillance visuelle des tags spécifiques
+  const isGlobalPhase = config.phase === 'full_pipeline' || config.phase === 'phase_deployment';
 
   return (
     <div className="min-h-screen pb-20 bg-slate-950 text-slate-200">
@@ -346,7 +350,8 @@ export default function App() {
                     <TagBadge 
                       key={tag.id} 
                       tag={tag} 
-                      isSelected={config.tags.includes(tag.id)} 
+                      // FIX: On n'affiche la sélection visuelle QUE si on n'est pas dans une phase globale
+                      isSelected={!isGlobalPhase && config.tags.includes(tag.id)} 
                       onClick={() => {
                         toggleSpecificTag(tag.id);
                         setHelpData({ title: tag.id, desc: tag.description, icon: "🏷️" });

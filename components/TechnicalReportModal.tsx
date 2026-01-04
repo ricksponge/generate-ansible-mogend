@@ -15,13 +15,14 @@ const REPORT_DATA: Record<string, any> = {
       { name: "vs-qual-m472-proxyma-app-443-fe", ip: "10.227.65.222", port: "443", pool: "443", dns: "morice.proxyma.ipms.qual.internal" }
     ],
     vms: [
-      { name: "dasqipmsm90principal01", ip: "10.227.84.216", acc: "MT", vlan: "VL112_T12_QUAL_BE_01", os: "DEB 12" },
-      { name: "dasqipmsm90recherche01", ip: "10.227.84.249", acc: "MT", vlan: "VL112_T12_QUAL_BE_01", os: "DEB 12" },
-      { name: "dasqipmsm90connecteur01", ip: "10.227.84.252", acc: "MT", vlan: "VL112_T12_QUAL_BE_01", os: "DEB 12" },
-      { name: "dasqipmsm90connecteurocr01", ip: "10.227.84.255", acc: "MT", vlan: "VL112_T12_QUAL_BE_01", os: "DEB 12" }
+      { name: "dasqipmsm90principal01", ip: "10.227.84.216 (MT) / 10.227.100.218 (SSH) / 10.227.169.46 (T3)", acc: "MT/SSH/T3", vlan: "VL112 / VL205 / VL107", os: "DEB 12" },
+      { name: "dasqipmsm90recherche01", ip: "10.227.84.249 (MT) / 10.227.100.251 (SSH)", acc: "MT/SSH", vlan: "VL112 / VL205", os: "DEB 12" },
+      { name: "dasqipmsm90connecteur01", ip: "10.227.84.252 (MT) / 10.227.101.0 (SSH) / 10.227.169.47 (T3)", acc: "MT/SSH/T3", vlan: "VL112 / VL205 / VL107", os: "DEB 12" },
+      { name: "dasqipmsm90connecteurocr01", ip: "10.227.84.255 (MT) / 10.227.101.1 (SSH) / 10.227.169.48 (T3)", acc: "MT/SSH/T3", vlan: "VL112 / VL205 / VL107", os: "DEB 12" },
+      { name: "dasqipmsm90solrpubli01", ip: "10.227.85.115 (MT) / 10.227.101.115 (SSH)", acc: "MT/SSH", vlan: "VL112 / VL205", os: "DEB 12" }
     ],
     sgbd: [
-      { name: "dapqosvcbdm90all", ip: "10.227.169.52", acc: "MT", vlan: "VL107_METIER-QUAL-T3-01", type: "PostgreSQL 16" }
+      { name: "dapqosvcbdm90all", ip: "10.227.169.52 (MT) / 172.18.27.173 (SSH)", acc: "MT/SSH", vlan: "VL107 / VL127", type: "PostgreSQL 16" }
     ],
     nfs: [
       { server: "10.227.80.13", path: "/srv/nfs/morice", size: "100Go" }
@@ -34,16 +35,16 @@ const REPORT_DATA: Record<string, any> = {
       { name: "vs-pprod-m472-app-proxyma-443-be", ip: "10.227.23.17", port: "443", pool: "443", dns: "morice.proxyma.ipms.prep.internal" }
     ],
     vms: [
-      { name: "dmpiipmsm472principal01", ip: "10.227.53.66", acc: "MT", vlan: "VL273", os: "DEB 12" },
-      { name: "dmpiipmsm472recherche01", ip: "10.227.53.67", acc: "MT", vlan: "VL273", os: "DEB 12" },
-      { name: "dmpiipmsm472connecteur01", ip: "10.227.53.68", acc: "MT", vlan: "VL273", os: "DEB 12" },
-      { name: "dmpiipmsm472connecteurocr01", ip: "10.227.53.69", acc: "MT", vlan: "VL273", os: "DEB 12" }
+      { name: "dmpiipmsm472principal01", ip: "172.18.79.66 (ADM) / 10.227.53.66 (MT) / 172.24.79.66 (LOGS) / 172.21.99.67 (T3)", acc: "ADM/MT/LOGS/T3", vlan: "VL179 / VL273 / VL3179 / VL465", os: "DEB 12" },
+      { name: "dmpiipmsm472recherche01", ip: "172.18.79.67 (ADM) / 10.227.53.67 (MT) / 172.24.79.67 (LOGS)", acc: "ADM/MT/LOGS", vlan: "VL179 / VL273 / VL3179", os: "DEB 12" },
+      { name: "dmpiipmsm472connecteur01", ip: "172.18.79.68 (ADM) / 10.227.53.68 (MT) / 172.24.79.68 (LOGS) / 172.21.99.69 (T3)", acc: "ADM/MT/LOGS/T3", vlan: "VL179 / VL273 / VL3179 / VL465", os: "DEB 12" },
+      { name: "dmpiipmsm472connecteurocr01", ip: "172.18.79.69 (ADM) / 10.227.53.69 (MT) / 172.24.79.69 (LOGS) / 172.21.99.70 (T3)", acc: "ADM/MT/LOGS/T3", vlan: "VL179 / VL273 / VL3179 / VL465", os: "DEB 12" }
     ],
     sgbd: [
-      { name: "dapiosvcbdmorice.pp.pgs", ip: "172.18.24.183", acc: "ADM", vlan: "VL124", type: "PostgreSQL 16" }
+      { name: "dapiosvcbdmorice.pp.pgs", ip: "172.18.24.183 (ADM) / 172.21.99.66 (T3)", acc: "ADM/T3", vlan: "VL124 / VL465", type: "PostgreSQL 16" }
     ],
     nfs: [
-      { server: "10.227.53.3", path: "/backup", size: "N/A" }
+      { server: "IINTMUT2-evs (10.227.53.3)", path: "/backup", size: "N/A" }
     ]
   },
   prod: {
@@ -53,16 +54,16 @@ const REPORT_DATA: Record<string, any> = {
       { name: "vs-prod-m472-principal-443-be", ip: "10.226.22.35", port: "443", pool: "443", dns: "principal.morice.ipms.internal" }
     ],
     vms: [
-      { name: "dmppipmsm472principal01", ip: "10.226.72.87/24", acc: "MET", vlan: "572", os: "DEBIAN 12" },
-      { name: "dmppipmsm472recherche01", ip: "10.226.72.88/24", acc: "MET", vlan: "572", os: "DEBIAN 12" },
-      { name: "dmppipmsm472connecteur01", ip: "10.226.72.89/24", acc: "MET", vlan: "572", os: "DEBIAN 12" },
-      { name: "dmppipmsm472connecteurocr01", ip: "10.226.72.90/24", acc: "MET", vlan: "572", os: "DEBIAN 12" }
+      { name: "dmppipmsm472principal01", ip: "172.18.73.86 (ADM) / 10.226.72.87 (MET) / 172.16.96.121 (T3) / 172.24.73.84 (COL)", acc: "ADM/MET/T3/COL", vlan: "173 / 572 / 431 / 3173", os: "DEBIAN 12" },
+      { name: "dmppipmsm472recherche01", ip: "172.18.73.87 (ADM) / 10.226.72.88 (MET) / 172.16.96.122 (T3) / 172.24.73.85 (COL)", acc: "ADM/MET/T3/COL", vlan: "173 / 572 / 431 / 3173", os: "DEBIAN 12" },
+      { name: "dmppipmsm472connecteur01", ip: "172.18.73.88 (ADM) / 10.226.72.89 (MET) / 172.16.96.123 (T3) / 172.24.73.86 (COL)", acc: "ADM/MET/T3/COL", vlan: "173 / 572 / 431 / 3173", os: "DEBIAN 12" },
+      { name: "dmppipmsm472connecteurocr01", ip: "172.18.73.89 (ADM) / 10.226.72.90 (MET) / 172.16.97.87 (T3) / 172.24.73.87 (COL)", acc: "ADM/MET/T3/COL", vlan: "173 / 572 / 431 / 3173", os: "DEBIAN 13" }
     ],
     sgbd: [
-      { name: "dasposvcbdmoricev2.pgs", ip: "172.16.96.120/20", acc: "MET", vlan: "431", type: "PostgreSQL 15" }
+      { name: "dapposvcbdmoricev2.pgs", ip: "172.18.14.161 (ADM) / 172.16.96.120 (MET) / 192.168.13.40 (COL)", acc: "ADM/MET/COL", vlan: "114 / 431 / 913", type: "PostgreSQL 15" }
     ],
     nfs: [
-      { server: "Ealfsabege572.ipms.private:/M472_MORICEV2", path: "/backup", size: "500 GB" }
+      { server: "Ealfsabege572.ipms.private (10.226.72.3)", path: "/M472_MORICEV2 /backup", size: "500 GB" }
     ],
     s3: [
       { url: "https://scality-s3.gendarmerie.fr/_/s3browser/buckets/[nom_bucket]", quota: "Xxx GB" }
@@ -155,9 +156,9 @@ const TechnicalReportModal: React.FC<TechnicalReportModalProps> = ({ isOpen, onC
                 <thead>
                   <tr className="bg-slate-800/50">
                     <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Nom / FQDN</th>
-                    <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">IP</th>
-                    <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Patte</th>
-                    <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">VLAN / Subnet</th>
+                    <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Adresses IP (Pattes)</th>
+                    <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Accès</th>
+                    <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">VLANs</th>
                     <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">OS</th>
                   </tr>
                 </thead>
@@ -165,7 +166,7 @@ const TechnicalReportModal: React.FC<TechnicalReportModalProps> = ({ isOpen, onC
                   {data.vms.map((row: any, i: number) => (
                     <tr key={i} className="border-t border-slate-800 hover:bg-slate-800/30 transition-colors group">
                       <td className="px-6 py-4 text-[11px] font-bold text-indigo-400 font-mono group-hover:text-indigo-300">{row.name}</td>
-                      <td className="px-6 py-4 text-xs font-bold text-white font-mono">{row.ip}</td>
+                      <td className="px-6 py-4 text-xs font-bold text-white font-mono leading-relaxed whitespace-pre-line">{row.ip}</td>
                       <td className="px-6 py-4 text-[10px] text-slate-500 font-bold">{row.acc}</td>
                       <td className="px-6 py-4 text-[10px] text-slate-400">{row.vlan}</td>
                       <td className="px-6 py-4 text-[10px] bg-slate-800/30 text-slate-500 font-mono text-center">{row.os}</td>
@@ -188,9 +189,9 @@ const TechnicalReportModal: React.FC<TechnicalReportModalProps> = ({ isOpen, onC
                   <div className="space-y-1">
                     <div className="text-[10px] font-black text-amber-500 uppercase tracking-widest">{db.type}</div>
                     <div className="text-sm font-bold text-white font-mono">{db.name}</div>
-                    <div className="text-xs text-slate-500 font-mono">{db.ip} (Patte {db.acc})</div>
+                    <div className="text-xs text-slate-500 font-mono leading-relaxed">{db.ip} (Patte {db.acc})</div>
                   </div>
-                  <div className="px-3 py-1 bg-amber-500/10 border border-amber-500/30 rounded-lg text-[10px] text-amber-500 font-bold uppercase">
+                  <div className="px-3 py-1 bg-amber-500/10 border border-amber-500/30 rounded-lg text-[10px] text-amber-500 font-bold uppercase whitespace-nowrap">
                     VLAN {db.vlan}
                   </div>
                 </div>

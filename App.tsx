@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { CommandConfig, Action } from './types';
 import { PROJECTS, ENVIRONMENTS, PHASES, SPECIFIC_TAGS, COMMON_GROUPS } from './constants';
 import CommandDisplay from './components/CommandDisplay';
+import AnsibleConfigModal from './components/AnsibleConfigModal';
 
 const INITIAL_CONFIG: CommandConfig = {
   project: PROJECTS[0].id,
@@ -99,6 +100,7 @@ const TagBadge: React.FC<TagBadgeProps> = ({ tag, isSelected, onClick }) => {
 export default function App() {
   const [config, setConfig] = useState<CommandConfig>(INITIAL_CONFIG);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const updateConfig = (updates: Partial<CommandConfig>) => {
     setConfig(prev => ({ ...prev, ...updates }));
@@ -131,6 +133,8 @@ export default function App() {
 
   return (
     <div className="min-h-screen pb-20 bg-slate-950 text-slate-200">
+      <AnsibleConfigModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      
       {/* Header */}
       <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
@@ -143,8 +147,14 @@ export default function App() {
               <span className="text-[10px] text-slate-500 font-mono uppercase tracking-widest">Forge M472 / SPWSI</span>
             </div>
           </div>
-          <div className="flex items-center space-x-4">
-             <span className="text-[10px] bg-slate-800 text-slate-400 px-2 py-1 rounded font-mono border border-slate-700">STABLE v3.2</span>
+          <div className="flex items-center space-x-3">
+             <button 
+               onClick={() => setIsModalOpen(true)}
+               className="text-[10px] bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest border border-indigo-500/30 transition-all"
+             >
+               Ansible CFG
+             </button>
+             <span className="text-[10px] bg-slate-800 text-slate-400 px-2 py-1.5 rounded-lg font-mono border border-slate-700">STABLE v3.3</span>
           </div>
         </div>
       </header>

@@ -1,0 +1,5 @@
+{
+  "name": "MOGEND Command Forge",
+  "description": "A high-performance command generator for MOGEND deployments, featuring precise tag management and phase-based Ansible playbook generation.",
+  "requestFramePermissions": []
+}

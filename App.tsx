@@ -173,7 +173,7 @@ export default function App() {
     } else if (phase === 'phase_deployment') {
       tags = ['verif', 'phase_precheck', 'phase_install', 'phase_configuration', 'phase_frontend', 'phase_mcf', 'phase_services', 'phase_start', 'phase_post', 'nftables', 'lancement', 'phase_backup', 'logs'];
     } else if (phase === 'custom_tags') {
-      tags = []; // Mode manuel : on vide tout pour laisser l'utilisateur choisir
+      tags = []; 
     } else {
       tags = [phase];
     }
@@ -185,7 +185,6 @@ export default function App() {
       ? config.tags.filter(t => t !== tagId) 
       : [...config.tags, tagId];
     
-    // Si on clique sur un tag alors qu'on était sur une phase globale, on passe automatiquement en mode manuel
     const newPhase = (config.phase === 'full_pipeline' || config.phase === 'phase_deployment' || config.phase === 'custom_tags') 
       ? config.phase 
       : 'custom_tags';
@@ -205,12 +204,40 @@ export default function App() {
     </button>
   );
 
-  // Détermine si on doit afficher la surbrillance visuelle des tags spécifiques
   const isGlobalPhase = config.phase === 'full_pipeline' || config.phase === 'phase_deployment';
   const isCustomPhase = config.phase === 'custom_tags';
 
   return (
     <div className="min-h-screen pb-20 bg-slate-950 text-slate-200">
+      <style>{`
+        @keyframes shimmer {
+          0% { transform: translateX(-150%) skewX(-20deg); }
+          100% { transform: translateX(150%) skewX(-20deg); }
+        }
+        @keyframes breathe {
+          0%, 100% { transform: scale(1); opacity: 0.95; }
+          50% { transform: scale(1.03); opacity: 1; }
+        }
+        .logo-animate {
+          animation: breathe 4s ease-in-out infinite;
+        }
+        .shimmer-effect::after {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 50%;
+          height: 100%;
+          background: linear-gradient(
+            to right,
+            transparent,
+            rgba(255, 255, 255, 0.3),
+            transparent
+          );
+          animation: shimmer 3s infinite;
+        }
+      `}</style>
+
       <AnsibleConfigModal isOpen={isConfigModalOpen} onClose={() => setIsConfigModalOpen(false)} />
       <ReadmeModal isOpen={isReadmeModalOpen} onClose={() => setIsReadmeModalOpen(false)} />
       <ArchitectureModal isOpen={isArchiModalOpen} onClose={() => setIsArchiModalOpen(false)} />
@@ -221,7 +248,6 @@ export default function App() {
       <UsefulLinksModal isOpen={isUsefulLinksModalOpen} onClose={() => setIsUsefulLinksModalOpen(false)} />
       <EasterEggModal isOpen={isEasterEggOpen} onClose={() => setIsEasterEggOpen(false)} />
       
-      {/* Help Context Modal */}
       <HelpModal 
         isOpen={!!helpData} 
         onClose={() => setHelpData(null)} 
@@ -237,10 +263,9 @@ export default function App() {
           <div className="flex items-center space-x-3">
             <button 
               onClick={() => setIsEasterEggOpen(true)}
-              className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20 hover:scale-105 active:scale-95 transition-all group relative overflow-hidden"
+              className="logo-animate shimmer-effect relative w-10 h-10 bg-gradient-to-br from-indigo-500 via-indigo-600 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 active:scale-95 transition-all overflow-hidden border border-white/10"
             >
-              <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity animate-pulse"></div>
-              <span className="text-white font-bold text-xl relative z-10">M</span>
+              <span className="text-white font-black text-xl relative z-10 italic">M</span>
             </button>
             <div>
               <h1 className="font-bold text-lg leading-none tracking-tight text-white uppercase italic">MOGEND</h1>
@@ -380,7 +405,6 @@ export default function App() {
                     <TagBadge 
                       key={tag.id} 
                       tag={tag} 
-                      // FIX: On affiche la sélection si on est en mode CUSTOM ou si le tag est déjà dans la liste
                       isSelected={(isCustomPhase || !isGlobalPhase) && config.tags.includes(tag.id)} 
                       onClick={() => {
                         toggleSpecificTag(tag.id);
@@ -391,88 +415,6 @@ export default function App() {
                 </div>
               </div>
             </div>
-          </section>
-
-          <section>
-             <button onClick={() => setShowAdvanced(!showAdvanced)} className="flex items-center space-x-2 text-slate-500 hover:text-indigo-400 transition-colors mb-4 group">
-                <span className={`transition-transform duration-300 ${showAdvanced ? 'rotate-90' : ''}`}>▶</span>
-                <span className="text-xs font-bold uppercase tracking-widest">Options Ansible Avancées & Secrets</span>
-             </button>
-
-             {showAdvanced && (
-               <div className="space-y-8 bg-indigo-950/20 p-8 rounded-3xl border border-indigo-500/20 animate-in fade-in slide-in-from-top-4 duration-300">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <div className="flex items-center">
-                        <span className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
-                          <span className="mr-2">🔐</span> Vault Password
-                        </span>
-                        <OptionHelpTrigger title="Vault Password" desc="Mot de passe chiffré permettant de déverrouiller les variables sensibles stockées dans group_vars/all.yml." icon="🔐" />
-                      </div>
-                      <input type="password" value={config.vaultPassword} onChange={(e) => updateConfig({ vaultPassword: e.target.value })} placeholder="••••••••••••" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-rose-400 font-mono focus:ring-1 focus:ring-rose-500 outline-none transition-all" />
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex items-center">
-                        <span className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
-                          <span className="mr-2">👤</span> Remote User (-u)
-                        </span>
-                        <OptionHelpTrigger title="Remote User" desc="L'utilisateur SSH utilisé pour se connecter aux machines distantes (ex: debian, root, datafari)." icon="👤" />
-                      </div>
-                      <input type="text" value={config.remoteUser} onChange={(e) => updateConfig({ remoteUser: e.target.value })} placeholder="ex: datafari" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:ring-1 focus:ring-indigo-500 outline-none" />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <div className="flex items-center">
-                        <span className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
-                          <span className="mr-2">🏁</span> Start at Task
-                        </span>
-                        <OptionHelpTrigger title="Start at Task" desc="Reprend l'exécution du playbook à partir du nom exact d'une tâche (utile après une erreur corrigée)." icon="🏁" />
-                      </div>
-                      <input type="text" value={config.startAtTask} onChange={(e) => updateConfig({ startAtTask: e.target.value })} placeholder="Nom exact de la tâche..." className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-emerald-400 font-mono focus:ring-1 focus:ring-indigo-500 outline-none" />
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex items-center">
-                        <span className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
-                          <span className="mr-2">➕</span> Extra Vars (-e)
-                        </span>
-                        <OptionHelpTrigger title="Extra Vars" desc="Injection de variables supplémentaires à la volée au format clé=valeur (ex: version=1.2.3)." icon="➕" />
-                      </div>
-                      <input type="text" value={config.extraVarsRaw} onChange={(e) => updateConfig({ extraVarsRaw: e.target.value })} placeholder="key1=val1 key2=val2" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-amber-400 font-mono focus:ring-1 focus:ring-amber-500 outline-none" />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-6 pt-4 border-t border-indigo-500/20">
-                    {[
-                      { label: "Verbose (-vvv)", key: "verbose", color: "bg-indigo-600", help: "Affiche le détail complet des logs Ansible (Debug)." },
-                      { label: "Dry Run (--check)", key: "checkMode", color: "bg-amber-600", help: "Simule l'exécution sans appliquer de changements réels." },
-                      { label: "Diff (--diff)", key: "diff", color: "bg-emerald-600", help: "Affiche les différences exactes dans les fichiers de configuration." },
-                      { label: "Step Mode (--step)", key: "step", color: "bg-rose-600", help: "Demande une confirmation manuelle avant chaque tâche." },
-                      { label: "Syntax Check", key: "syntaxCheck", color: "bg-slate-600", help: "Vérifie la syntaxe YAML sans pour autant contacter les serveurs." },
-                      { label: "List Tasks", key: "listTasks", color: "bg-slate-600", help: "Affiche simplement la liste des tâches ordonnées." },
-                    ].map((toggle) => (
-                      <div key={toggle.key} className="flex flex-col space-y-1">
-                        <label className="flex items-center space-x-3 cursor-pointer group">
-                          <div className={`w-10 h-5 rounded-full transition-all relative ${config[toggle.key as keyof CommandConfig] ? toggle.color : 'bg-slate-700'}`}>
-                            <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${config[toggle.key as keyof CommandConfig] ? 'left-5.5' : 'left-0.5'}`} />
-                          </div>
-                          <input type="checkbox" className="hidden" checked={!!config[toggle.key as keyof CommandConfig]} onChange={() => updateConfig({ [toggle.key]: !config[toggle.key as keyof CommandConfig] })} />
-                          <span className="text-[10px] font-bold text-slate-400 group-hover:text-slate-200 transition-colors uppercase tracking-widest flex items-center">
-                            {toggle.label}
-                          </span>
-                        </label>
-                        <button 
-                          onClick={() => setHelpData({ title: toggle.label, desc: toggle.help, icon: "⚙️" })}
-                          className="text-[8px] text-slate-600 hover:text-indigo-400 transition-colors uppercase text-left w-fit border-b border-dotted border-slate-800"
-                        >
-                          Détails
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-               </div>
-             )}
           </section>
         </div>
 
@@ -495,75 +437,10 @@ export default function App() {
                  </div>
                  <CommandDisplay config={config} />
               </div>
-
-              <div className="mt-8 p-6 bg-slate-900/50 rounded-2xl border border-slate-800 space-y-4 shadow-xl">
-                <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-2">Résumé d'Exécution</h3>
-                <div className="grid grid-cols-2 gap-4 text-xs">
-                  <div className="space-y-1">
-                    <span className="text-slate-500 block">Environnement</span>
-                    <span className={`font-bold px-2 py-0.5 rounded text-white ${ENVIRONMENTS.find(e => e.value === config.environment)?.color}`}>{config.environment.toUpperCase()}</span>
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-slate-500 block">Limit Target</span>
-                    <span className="text-amber-400 font-mono font-bold uppercase">{config.limit || 'ALL'}</span>
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-slate-500 block">Vault Mode</span>
-                    <span className={`font-bold uppercase font-mono ${config.vaultPassword ? 'text-emerald-400' : 'text-rose-500'}`}>{config.vaultPassword ? 'PROTECTED (PWD)' : 'ASK-PASS'}</span>
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-slate-500 block">Timeout</span>
-                    <span className="text-indigo-400 font-bold">{config.timeout > 0 ? `${config.timeout}s` : 'Défaut'}</span>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <section className="animate-in fade-in slide-in-from-right-4 duration-500">
-              <h2 className="text-xl font-bold mb-6 flex items-center text-white">
-                <span className="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-500 flex items-center justify-center mr-3 text-sm">05</span>
-                Accès Application
-              </h2>
-              <div className="bg-gradient-to-br from-indigo-900/40 to-slate-900 border border-indigo-500/30 p-6 rounded-2xl shadow-2xl relative group overflow-hidden">
-                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                   <span className="text-6xl">🌐</span>
-                </div>
-                <div className="relative z-10 space-y-4">
-                  <div>
-                    <h3 className="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-1">Frontend MORICE ({config.environment.toUpperCase()})</h3>
-                    <p className="text-[10px] text-slate-500 font-mono break-all">{currentFrontendUrl}</p>
-                  </div>
-                  <a 
-                    href={currentFrontendUrl} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center space-x-3 w-full bg-gradient-to-r from-indigo-600 to-emerald-600 hover:from-indigo-500 hover:to-emerald-500 text-white py-3 rounded-xl font-bold uppercase tracking-widest text-xs transition-all shadow-lg shadow-indigo-500/20 active:scale-95"
-                  >
-                    <span>Ouvrir l'application</span>
-                    <span className="text-lg">↗</span>
-                  </a>
-                  <p className="text-[9px] text-slate-600 italic text-center">
-                    Note : Nécessite une authentification SSO Certilibre / ProxyMA active.
-                  </p>
-                </div>
-              </div>
             </section>
           </div>
         </div>
       </main>
-
-      <footer className="mt-20 border-t border-slate-800 py-12 bg-slate-950/50">
-         <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-[10px] text-slate-600 font-mono uppercase tracking-widest">
-            <p>© 2025 MOGEND Command Forge — SPWSI / M472</p>
-            <div className="flex flex-wrap justify-center gap-4 mt-4 md:mt-0">
-               <button onClick={() => setIsUsefulLinksModalOpen(true)} className="flex items-center space-x-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 px-4 py-2 rounded-xl border border-blue-500/30 transition-all font-bold uppercase tracking-widest text-[9px]"><span>🔗</span><span>Liens Utiles</span></button>
-               <button onClick={() => setIsRptModalOpen(true)} className="flex items-center space-x-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 px-4 py-2 rounded-xl border border-emerald-500/30 transition-all font-bold uppercase tracking-widest text-[9px]"><span>📄</span><span>RPT Technical</span></button>
-               <button onClick={() => setIsMaintenanceModalOpen(true)} className="flex items-center space-x-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 px-4 py-2 rounded-xl border border-amber-500/30 transition-all font-bold uppercase tracking-widest text-[9px]"><span>🛠️</span><span>Maintenance</span></button>
-               <button onClick={() => setIsUserGuideModalOpen(true)} className="flex items-center space-x-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 px-4 py-2 rounded-xl border border-indigo-500/30 transition-all font-bold uppercase tracking-widest text-[9px]"><span>📙</span><span>User Guide</span></button>
-               <button onClick={() => setIsProjectInfoModalOpen(true)} className="flex items-center space-x-2 bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-xl border border-slate-700 transition-all font-bold uppercase tracking-widest text-[9px]"><span>📊</span><span>Project Info</span></button>
-            </div>
-         </div>
-      </footer>
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { CommandConfig, Action } from './types';
 import { PROJECTS, ENVIRONMENTS, PHASES, SPECIFIC_TAGS, COMMON_GROUPS } from './constants';
 import CommandDisplay from './components/CommandDisplay';
 import AnsibleConfigModal from './components/AnsibleConfigModal';
+import ReadmeModal from './components/ReadmeModal';
 
 const INITIAL_CONFIG: CommandConfig = {
   project: PROJECTS[0].id,
@@ -23,6 +24,8 @@ const INITIAL_CONFIG: CommandConfig = {
   startAtTask: '',
   phase: 'phase_precheck'
 };
+
+const REPO_DOWNLOAD_URL = "https://omnibus-pic.gendarmerie.fr/spwsi/morice2/deploiement/-/archive/dev_lommere/deploiement-dev_lommere.tar.gz";
 
 interface PhaseButtonProps {
   phase: any;
@@ -100,7 +103,8 @@ const TagBadge: React.FC<TagBadgeProps> = ({ tag, isSelected, onClick }) => {
 export default function App() {
   const [config, setConfig] = useState<CommandConfig>(INITIAL_CONFIG);
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
+  const [isReadmeModalOpen, setIsReadmeModalOpen] = useState(false);
 
   const updateConfig = (updates: Partial<CommandConfig>) => {
     setConfig(prev => ({ ...prev, ...updates }));
@@ -131,9 +135,14 @@ export default function App() {
     updateConfig({ tags: newTags, phase: 'custom' });
   };
 
+  const handleDownloadRepo = () => {
+    window.open(REPO_DOWNLOAD_URL, '_blank');
+  };
+
   return (
     <div className="min-h-screen pb-20 bg-slate-950 text-slate-200">
-      <AnsibleConfigModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <AnsibleConfigModal isOpen={isConfigModalOpen} onClose={() => setIsConfigModalOpen(false)} />
+      <ReadmeModal isOpen={isReadmeModalOpen} onClose={() => setIsReadmeModalOpen(false)} />
       
       {/* Header */}
       <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
@@ -149,12 +158,26 @@ export default function App() {
           </div>
           <div className="flex items-center space-x-3">
              <button 
-               onClick={() => setIsModalOpen(true)}
+               onClick={handleDownloadRepo}
+               className="group flex items-center space-x-2 text-[10px] bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest border border-emerald-500/30 transition-all"
+             >
+               <span className="text-sm">📥</span>
+               <span>Dépôt Ansible</span>
+             </button>
+             <button 
+               onClick={() => setIsReadmeModalOpen(true)}
+               className="group flex items-center space-x-2 text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest border border-slate-700 transition-all"
+             >
+               <span className="text-sm">📖</span>
+               <span>Documentation</span>
+             </button>
+             <button 
+               onClick={() => setIsConfigModalOpen(true)}
                className="text-[10px] bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest border border-indigo-500/30 transition-all"
              >
                Ansible CFG
              </button>
-             <span className="text-[10px] bg-slate-800 text-slate-400 px-2 py-1.5 rounded-lg font-mono border border-slate-700">STABLE v3.3</span>
+             <span className="text-[10px] bg-slate-800 text-slate-400 px-2 py-1.5 rounded-lg font-mono border border-slate-700">v3.4</span>
           </div>
         </div>
       </header>

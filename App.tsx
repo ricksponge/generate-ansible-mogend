@@ -47,6 +47,29 @@ const FRONTEND_LINKS: Record<string, string> = {
   prod: "https://mogend.sso.gendarmerie.fr"
 };
 
+const LabelTooltip: React.FC<{ text: string, children: React.ReactNode }> = ({ text, children }) => {
+  const [show, setShow] = useState(false);
+  return (
+    <div className="relative inline-block group">
+      <div 
+        onMouseEnter={() => setShow(true)}
+        onMouseLeave={() => setShow(false)}
+        className="cursor-help"
+      >
+        {children}
+      </div>
+      {show && (
+        <div className="absolute z-[120] bottom-full left-0 mb-2 w-56 p-2 bg-slate-900 border border-slate-700 rounded shadow-2xl animate-in fade-in zoom-in-95 duration-150 pointer-events-none">
+          <p className="text-[10px] text-slate-300 leading-tight font-medium normal-case tracking-normal">
+            {text}
+          </p>
+          <div className="absolute top-full left-4 border-4 border-transparent border-t-slate-700"></div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 interface PhaseButtonProps {
   phase: any;
   isActive: boolean;
@@ -296,61 +319,83 @@ export default function App() {
                <div className="space-y-8 bg-indigo-950/20 p-8 rounded-3xl border border-indigo-500/20 animate-in fade-in slide-in-from-top-4 duration-300">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
-                        <span className="mr-2">🔐</span> Vault Password
-                      </label>
+                      <LabelTooltip text="Mot de passe chiffré permettant de déverrouiller les variables sensibles stockées dans group_vars/all.yml.">
+                        <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center hover:text-rose-400 transition-colors">
+                          <span className="mr-2">🔐</span> Vault Password
+                        </label>
+                      </LabelTooltip>
                       <input type="password" value={config.vaultPassword} onChange={(e) => updateConfig({ vaultPassword: e.target.value })} placeholder="••••••••••••" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-rose-400 font-mono focus:ring-1 focus:ring-rose-500 outline-none transition-all" />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
-                        <span className="mr-2">👤</span> Remote User (-u)
-                      </label>
+                      <LabelTooltip text="L'utilisateur SSH utilisé pour se connecter aux machines distantes (ex: debian, root, datafari).">
+                        <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center hover:text-indigo-400 transition-colors">
+                          <span className="mr-2">👤</span> Remote User (-u)
+                        </label>
+                      </LabelTooltip>
                       <input type="text" value={config.remoteUser} onChange={(e) => updateConfig({ remoteUser: e.target.value })} placeholder="ex: datafari" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:ring-1 focus:ring-indigo-500 outline-none" />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
-                        <span className="mr-2">🏁</span> Start at Task
-                      </label>
+                      <LabelTooltip text="Reprend l'exécution du playbook à partir du nom exact d'une tâche (utile après une erreur corrigée).">
+                        <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center hover:text-emerald-400 transition-colors">
+                          <span className="mr-2">🏁</span> Start at Task
+                        </label>
+                      </LabelTooltip>
                       <input type="text" value={config.startAtTask} onChange={(e) => updateConfig({ startAtTask: e.target.value })} placeholder="Nom exact de la tâche..." className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-emerald-400 font-mono focus:ring-1 focus:ring-indigo-500 outline-none" />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
-                        <span className="mr-2">➕</span> Extra Vars (-e)
-                      </label>
+                      <LabelTooltip text="Injection de variables supplémentaires à la volée au format clé=valeur (ex: version=1.2.3).">
+                        <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center hover:text-amber-400 transition-colors">
+                          <span className="mr-2">➕</span> Extra Vars (-e)
+                        </label>
+                      </LabelTooltip>
                       <input type="text" value={config.extraVarsRaw} onChange={(e) => updateConfig({ extraVarsRaw: e.target.value })} placeholder="key1=val1 key2=val2" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-amber-400 font-mono focus:ring-1 focus:ring-amber-500 outline-none" />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Forks (-f)</label>
+                      <LabelTooltip text="Nombre de processus parallèles. Augmente la vitesse de déploiement sur plusieurs nœuds.">
+                        <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center hover:text-indigo-400 transition-colors">
+                          Forks (-f)
+                        </label>
+                      </LabelTooltip>
                       <input type="number" value={config.forks || ''} onChange={(e) => updateConfig({ forks: parseInt(e.target.value) || 0 })} placeholder="0 (Auto)" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2 text-sm text-slate-200 focus:ring-1 focus:ring-indigo-500 outline-none" />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">SSH Timeout (s)</label>
+                      <LabelTooltip text="Délai maximum d'attente pour la réponse SSH avant de considérer l'hôte comme injoignable.">
+                        <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center hover:text-indigo-400 transition-colors">
+                          SSH Timeout (s)
+                        </label>
+                      </LabelTooltip>
                       <input type="number" value={config.timeout || ''} onChange={(e) => updateConfig({ timeout: parseInt(e.target.value) || 0 })} placeholder="Par défaut (10s)" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2 text-sm text-slate-200 focus:ring-1 focus:ring-indigo-500 outline-none" />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-6 pt-4 border-t border-indigo-500/20">
                     {[
-                      { label: "Verbose (-vvv)", key: "verbose", color: "bg-indigo-600" },
-                      { label: "Dry Run (--check)", key: "checkMode", color: "bg-amber-600" },
-                      { label: "Diff (--diff)", key: "diff", color: "bg-emerald-600" },
-                      { label: "Step Mode (--step)", key: "step", color: "bg-rose-600" },
-                      { label: "Syntax Check", key: "syntaxCheck", color: "bg-slate-600" },
-                      { label: "List Tasks", key: "listTasks", color: "bg-slate-600" },
+                      { label: "Verbose (-vvv)", key: "verbose", color: "bg-indigo-600", help: "Affiche le détail complet des logs Ansible (Debug)." },
+                      { label: "Dry Run (--check)", key: "checkMode", color: "bg-amber-600", help: "Simule l'exécution sans appliquer de changements réels." },
+                      { label: "Diff (--diff)", key: "diff", color: "bg-emerald-600", help: "Affiche les différences exactes dans les fichiers de configuration." },
+                      { label: "Step Mode (--step)", key: "step", color: "bg-rose-600", help: "Demande une confirmation manuelle avant chaque tâche." },
+                      { label: "Syntax Check", key: "syntaxCheck", color: "bg-slate-600", help: "Vérifie la syntaxe YAML sans contacter les serveurs." },
+                      { label: "List Tasks", key: "listTasks", color: "bg-slate-600", help: "Affiche simplement la liste des tâches ordonnées." },
                     ].map((toggle) => (
-                      <label key={toggle.key} className="flex items-center space-x-3 cursor-pointer group">
-                        <div className={`w-10 h-5 rounded-full transition-all relative ${config[toggle.key as keyof CommandConfig] ? toggle.color : 'bg-slate-700'}`}>
-                          <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${config[toggle.key as keyof CommandConfig] ? 'left-5.5' : 'left-0.5'}`} />
-                        </div>
-                        <input type="checkbox" className="hidden" checked={!!config[toggle.key as keyof CommandConfig]} onChange={() => updateConfig({ [toggle.key]: !config[toggle.key as keyof CommandConfig] })} />
-                        <span className="text-[10px] font-bold text-slate-400 group-hover:text-slate-200 transition-colors uppercase tracking-widest">{toggle.label}</span>
-                      </label>
+                      <div key={toggle.key} className="flex flex-col">
+                        <label className="flex items-center space-x-3 cursor-pointer group">
+                          <div className={`w-10 h-5 rounded-full transition-all relative ${config[toggle.key as keyof CommandConfig] ? toggle.color : 'bg-slate-700'}`}>
+                            <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${config[toggle.key as keyof CommandConfig] ? 'left-5.5' : 'left-0.5'}`} />
+                          </div>
+                          <input type="checkbox" className="hidden" checked={!!config[toggle.key as keyof CommandConfig]} onChange={() => updateConfig({ [toggle.key]: !config[toggle.key as keyof CommandConfig] })} />
+                          <LabelTooltip text={toggle.help}>
+                            <span className="text-[10px] font-bold text-slate-400 group-hover:text-slate-200 transition-colors uppercase tracking-widest flex items-center">
+                              {toggle.label}
+                            </span>
+                          </LabelTooltip>
+                        </label>
+                      </div>
                     ))}
                   </div>
                </div>

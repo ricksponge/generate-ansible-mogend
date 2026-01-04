@@ -11,6 +11,7 @@ import UserGuideModal from './components/UserGuideModal';
 import MaintenanceScriptsModal from './components/MaintenanceScriptsModal';
 import TechnicalReportModal from './components/TechnicalReportModal';
 import UsefulLinksModal from './components/UsefulLinksModal';
+import EasterEggModal from './components/EasterEggModal';
 
 const INITIAL_CONFIG: CommandConfig = {
   project: PROJECTS[0].id,
@@ -154,19 +155,25 @@ export default function App() {
   const [isMaintenanceModalOpen, setIsMaintenanceModalOpen] = useState(false);
   const [isRptModalOpen, setIsRptModalOpen] = useState(false);
   const [isUsefulLinksModalOpen, setIsUsefulLinksModalOpen] = useState(false);
+  const [isEasterEggOpen, setIsEasterEggOpen] = useState(false);
 
   const updateConfig = (updates: Partial<CommandConfig>) => {
     setConfig(prev => ({ ...prev, ...updates }));
   };
 
+  const handleReset = () => {
+    setConfig(INITIAL_CONFIG);
+    setShowAdvanced(false);
+  };
+
   const handlePhaseApply = (phase: string) => {
     let tags: string[] = [];
     if (phase === 'full_pipeline') {
-      // Tags exacts du script run.sh Case 7
       tags = ['copie', 'bootstrap', 'verif', 'phase_precheck', 'phase_install', 'phase_configuration', 'phase_frontend', 'phase_mcf', 'phase_services', 'phase_start', 'phase_post', 'nftables', 'lancement', 'phase_backup', 'logs'];
     } else if (phase === 'phase_deployment') {
-      // Tags exacts du script run.sh Case 9
       tags = ['verif', 'phase_precheck', 'phase_install', 'phase_configuration', 'phase_frontend', 'phase_mcf', 'phase_services', 'phase_start', 'phase_post', 'nftables', 'lancement', 'phase_backup', 'logs'];
+    } else if (phase === 'custom_tags') {
+      tags = []; // Mode manuel : on vide tout pour laisser l'utilisateur choisir
     } else {
       tags = [phase];
     }
@@ -177,8 +184,13 @@ export default function App() {
     const newTags = config.tags.includes(tagId) 
       ? config.tags.filter(t => t !== tagId) 
       : [...config.tags, tagId];
-    // On repasse en mode "custom" pour autoriser la surbrillance visuelle
-    updateConfig({ tags: newTags, phase: 'custom' });
+    
+    // Si on clique sur un tag alors qu'on était sur une phase globale, on passe automatiquement en mode manuel
+    const newPhase = (config.phase === 'full_pipeline' || config.phase === 'phase_deployment' || config.phase === 'custom_tags') 
+      ? config.phase 
+      : 'custom_tags';
+
+    updateConfig({ tags: newTags, phase: newPhase });
   };
 
   const currentFrontendUrl = FRONTEND_LINKS[config.environment] || FRONTEND_LINKS.qual;
@@ -195,6 +207,7 @@ export default function App() {
 
   // Détermine si on doit afficher la surbrillance visuelle des tags spécifiques
   const isGlobalPhase = config.phase === 'full_pipeline' || config.phase === 'phase_deployment';
+  const isCustomPhase = config.phase === 'custom_tags';
 
   return (
     <div className="min-h-screen pb-20 bg-slate-950 text-slate-200">
@@ -206,6 +219,7 @@ export default function App() {
       <MaintenanceScriptsModal isOpen={isMaintenanceModalOpen} onClose={() => setIsMaintenanceModalOpen(false)} />
       <TechnicalReportModal isOpen={isRptModalOpen} onClose={() => setIsRptModalOpen(false)} initialEnv={config.environment} />
       <UsefulLinksModal isOpen={isUsefulLinksModalOpen} onClose={() => setIsUsefulLinksModalOpen(false)} />
+      <EasterEggModal isOpen={isEasterEggOpen} onClose={() => setIsEasterEggOpen(false)} />
       
       {/* Help Context Modal */}
       <HelpModal 
@@ -221,9 +235,13 @@ export default function App() {
       <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
-              <span className="text-white font-bold text-xl">M</span>
-            </div>
+            <button 
+              onClick={() => setIsEasterEggOpen(true)}
+              className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20 hover:scale-105 active:scale-95 transition-all group relative overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity animate-pulse"></div>
+              <span className="text-white font-bold text-xl relative z-10">M</span>
+            </button>
             <div>
               <h1 className="font-bold text-lg leading-none tracking-tight text-white uppercase italic">MOGEND</h1>
               <span className="text-[10px] text-slate-500 font-mono uppercase tracking-widest">Forge M472 / SPWSI</span>
@@ -258,10 +276,19 @@ export default function App() {
       <main className="max-w-7xl mx-auto px-4 pt-10 grid grid-cols-1 lg:grid-cols-12 gap-10">
         <div className="lg:col-span-7 space-y-8">
           <section>
-            <h2 className="text-xl font-bold mb-6 flex items-center text-white">
-              <span className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-500 flex items-center justify-center mr-3 text-sm">01</span>
-              Environnement & Cible
-            </h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold flex items-center text-white">
+                <span className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-500 flex items-center justify-center mr-3 text-sm">01</span>
+                Environnement & Cible
+              </h2>
+              <button 
+                onClick={handleReset}
+                className="flex items-center space-x-2 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-rose-400 transition-all px-4 py-2 bg-slate-900 border border-slate-800 rounded-xl hover:border-rose-500/30"
+              >
+                <span>🔄</span>
+                <span>Réinitialiser tout</span>
+              </button>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <label className="text-sm font-semibold text-slate-400">Environnement</label>
@@ -343,15 +370,18 @@ export default function App() {
               </div>
               <div className="space-y-4">
                 <label className="text-sm font-semibold text-slate-400 uppercase tracking-widest flex justify-between items-center">
-                  <span>Tags Spécifiques</span>
+                  <div className="flex items-center space-x-2">
+                    <span>Tags Spécifiques</span>
+                    {isCustomPhase && <span className="text-[10px] text-indigo-400 font-black tracking-widest animate-pulse border border-indigo-500/20 bg-indigo-500/5 px-2 py-0.5 rounded-full uppercase">Mode Manuel Actif</span>}
+                  </div>
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {SPECIFIC_TAGS.map(tag => (
                     <TagBadge 
                       key={tag.id} 
                       tag={tag} 
-                      // FIX: On n'affiche la sélection visuelle QUE si on n'est pas dans une phase globale
-                      isSelected={!isGlobalPhase && config.tags.includes(tag.id)} 
+                      // FIX: On affiche la sélection si on est en mode CUSTOM ou si le tag est déjà dans la liste
+                      isSelected={(isCustomPhase || !isGlobalPhase) && config.tags.includes(tag.id)} 
                       onClick={() => {
                         toggleSpecificTag(tag.id);
                         setHelpData({ title: tag.id, desc: tag.description, icon: "🏷️" });
@@ -419,7 +449,7 @@ export default function App() {
                       { label: "Dry Run (--check)", key: "checkMode", color: "bg-amber-600", help: "Simule l'exécution sans appliquer de changements réels." },
                       { label: "Diff (--diff)", key: "diff", color: "bg-emerald-600", help: "Affiche les différences exactes dans les fichiers de configuration." },
                       { label: "Step Mode (--step)", key: "step", color: "bg-rose-600", help: "Demande une confirmation manuelle avant chaque tâche." },
-                      { label: "Syntax Check", key: "syntaxCheck", color: "bg-slate-600", help: "Vérifie la syntaxe YAML sans contacter les serveurs." },
+                      { label: "Syntax Check", key: "syntaxCheck", color: "bg-slate-600", help: "Vérifie la syntaxe YAML sans pour autant contacter les serveurs." },
                       { label: "List Tasks", key: "listTasks", color: "bg-slate-600", help: "Affiche simplement la liste des tâches ordonnées." },
                     ].map((toggle) => (
                       <div key={toggle.key} className="flex flex-col space-y-1">

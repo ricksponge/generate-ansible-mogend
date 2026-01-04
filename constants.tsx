@@ -107,6 +107,12 @@ export const PHASES: PhaseConfig[] = [
     description: 'Séquence totale : Bootstrap système, Prechecks, Installation, Services, Backup et Logs.'
   },
   { 
+    value: 'custom_tags', 
+    label: 'Tags Spécifiques', 
+    icon: '🏷️',
+    description: 'Mode manuel : Aucun tag par défaut. Sélectionnez précisément les actions à exécuter dans la liste ci-dessous.'
+  },
+  { 
     value: 'phase_backup', 
     label: 'Backup', 
     icon: '💾',

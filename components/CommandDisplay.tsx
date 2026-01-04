@@ -48,6 +48,7 @@ const CommandDisplay: React.FC<CommandDisplayProps> = ({ config }) => {
     if (config.forks && config.forks > 0) args.push(`-f ${config.forks}`);
     if (config.timeout && config.timeout > 0) args.push(`--timeout ${config.timeout}`);
     if (config.remoteUser) args.push(`-u ${config.remoteUser}`);
+    if (config.become) args.push(`--become`);
     if (config.verbose) args.push(`-vvv`);
     if (config.checkMode) args.push(`--check`);
     if (config.diff) args.push(`--diff`);
@@ -78,8 +79,6 @@ const CommandDisplay: React.FC<CommandDisplayProps> = ({ config }) => {
     finalCmd += ansiblePlaybookCmd;
 
     // D. Nettoyage final (si applicable)
-    // On utilise && rm pour s'assurer que si ansible réussit, le fichier est supprimé.
-    // On pourrait utiliser ; rm pour être sûr, mais restons sur un chaînage cohérent.
     if (hasVault) {
       finalCmd += ` && \\\nrm -f .vault_pass`;
     }

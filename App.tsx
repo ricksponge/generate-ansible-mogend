@@ -21,12 +21,19 @@ const INITIAL_CONFIG: CommandConfig = {
   tags: ['phase_precheck'],
   skipTags: [],
   extraVars: {},
+  extraVarsRaw: '',
   limit: 'all',
   forks: 0,
   diff: false,
   remoteUser: '',
   become: false,
   startAtTask: '',
+  step: false,
+  syntaxCheck: false,
+  listTasks: false,
+  listTags: false,
+  timeout: 0, // Désactivé par défaut
+  vaultPassword: '',
   phase: 'phase_precheck'
 };
 
@@ -159,7 +166,6 @@ export default function App() {
       <MaintenanceScriptsModal isOpen={isMaintenanceModalOpen} onClose={() => setIsMaintenanceModalOpen(false)} />
       <TechnicalReportModal isOpen={isRptModalOpen} onClose={() => setIsRptModalOpen(false)} initialEnv={config.environment} />
       
-      {/* Header */}
       <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -172,38 +178,23 @@ export default function App() {
             </div>
           </div>
           <div className="flex items-center space-x-3">
-             <button 
-               onClick={() => setIsRptModalOpen(true)}
-               className="group flex items-center space-x-2 text-[10px] bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest border border-emerald-500/30 transition-all shadow-lg shadow-emerald-500/10"
-             >
+             <button onClick={() => setIsRptModalOpen(true)} className="flex items-center space-x-2 text-[10px] bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest border border-emerald-500/30 transition-all shadow-lg shadow-emerald-500/10">
                <span className="text-sm">📄</span>
                <span>RPT Tech</span>
              </button>
-             <button 
-               onClick={() => setIsArchiModalOpen(true)}
-               className="group flex items-center space-x-2 text-[10px] bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest border border-indigo-500/30 transition-all"
-             >
+             <button onClick={() => setIsArchiModalOpen(true)} className="flex items-center space-x-2 text-[10px] bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest border border-indigo-500/30 transition-all">
                <span className="text-sm">🏗️</span>
                <span>Architecture</span>
              </button>
-             <button 
-               onClick={handleDownloadRepo}
-               className="group flex items-center space-x-2 text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest border border-slate-700 transition-all"
-             >
+             <button onClick={handleDownloadRepo} className="flex items-center space-x-2 text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest border border-slate-700 transition-all">
                <span className="text-sm">📥</span>
                <span>Ansible</span>
              </button>
-             <button 
-               onClick={() => setIsReadmeModalOpen(true)}
-               className="group flex items-center space-x-2 text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest border border-slate-700 transition-all"
-             >
+             <button onClick={() => setIsReadmeModalOpen(true)} className="flex items-center space-x-2 text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest border border-slate-700 transition-all">
                <span className="text-sm">📖</span>
                <span>Doc</span>
              </button>
-             <button 
-               onClick={() => setIsConfigModalOpen(true)}
-               className="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest border border-slate-700 transition-all"
-             >
+             <button onClick={() => setIsConfigModalOpen(true)} className="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest border border-slate-700 transition-all">
                Cfg
              </button>
              <span className="text-[10px] bg-slate-800 text-slate-400 px-2 py-1.5 rounded-lg font-mono border border-slate-700">v3.5</span>
@@ -213,50 +204,28 @@ export default function App() {
 
       <main className="max-w-7xl mx-auto px-4 pt-10 grid grid-cols-1 lg:grid-cols-12 gap-10">
         <div className="lg:col-span-7 space-y-8">
-          
-          {/* 01 Target & Env */}
           <section>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold flex items-center text-white">
-                <span className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-500 flex items-center justify-center mr-3 text-sm">01</span>
-                Environnement & Cible
-              </h2>
-            </div>
-            
+            <h2 className="text-xl font-bold mb-6 flex items-center text-white">
+              <span className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-500 flex items-center justify-center mr-3 text-sm">01</span>
+              Environnement & Cible
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <label className="text-sm font-semibold text-slate-400">Environnement</label>
                 <div className="grid grid-cols-1 gap-2">
                   {ENVIRONMENTS.map(env => (
-                    <button
-                      key={env.value}
-                      onClick={() => updateConfig({ environment: env.value })}
-                      className={`p-4 rounded-xl border text-left transition-all flex items-center justify-between ${
-                        config.environment === env.value 
-                        ? `${env.color} border-transparent text-white shadow-lg scale-[1.02]` 
-                        : 'bg-slate-800/50 border-slate-700 text-slate-400 hover:border-slate-500 hover:bg-slate-800'
-                      }`}
-                    >
+                    <button key={env.value} onClick={() => updateConfig({ environment: env.value })} className={`p-4 rounded-xl border text-left transition-all flex items-center justify-between ${config.environment === env.value ? `${env.color} border-transparent text-white shadow-lg scale-[1.02]` : 'bg-slate-800/50 border-slate-700 text-slate-400 hover:border-slate-500 hover:bg-slate-800'}`}>
                       <span className="font-bold uppercase tracking-wider">{env.label}</span>
                       {config.environment === env.value && <span className="text-white">✔</span>}
                     </button>
                   ))}
                 </div>
               </div>
-
               <div className="space-y-4">
                 <label className="text-sm font-semibold text-slate-400">Composant</label>
                 <div className="grid grid-cols-1 gap-2">
                   {PROJECTS.map(project => (
-                    <button
-                      key={project.id}
-                      onClick={() => updateConfig({ project: project.id })}
-                      className={`p-3 rounded-xl border text-left transition-all flex items-center space-x-3 ${
-                        config.project === project.id 
-                        ? 'bg-indigo-500/10 border-indigo-500/50 text-indigo-400' 
-                        : 'bg-slate-800/50 border-slate-700 text-slate-400 hover:border-slate-500'
-                      }`}
-                    >
+                    <button key={project.id} onClick={() => updateConfig({ project: project.id })} className={`p-3 rounded-xl border text-left transition-all flex items-center space-x-3 ${config.project === project.id ? 'bg-indigo-500/10 border-indigo-500/50 text-indigo-400' : 'bg-slate-800/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>
                       <span className="text-xl">{project.icon}</span>
                       <span className="font-medium text-sm">{project.name}</span>
                     </button>
@@ -266,7 +235,6 @@ export default function App() {
             </div>
           </section>
 
-          {/* 02 Limit Group */}
           <section>
             <h2 className="text-xl font-bold mb-6 flex items-center text-white">
               <span className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-500 flex items-center justify-center mr-3 text-sm">02</span>
@@ -275,168 +243,140 @@ export default function App() {
             <div className="bg-slate-900/40 p-6 rounded-2xl border border-slate-800 space-y-4">
               <div className="flex flex-wrap gap-2">
                 {COMMON_GROUPS.map(group => (
-                  <button
-                    key={group.id}
-                    onClick={() => updateConfig({ limit: group.id })}
-                    className={`px-4 py-2 rounded-lg border text-xs font-bold transition-all ${
-                      config.limit === group.id 
-                      ? 'bg-amber-600 border-amber-400 text-white shadow-lg shadow-amber-900/20' 
-                      : 'bg-slate-800/50 border-slate-700 text-slate-500 hover:text-slate-200'
-                    }`}
-                  >
+                  <button key={group.id} onClick={() => updateConfig({ limit: group.id })} className={`px-4 py-2 rounded-lg border text-xs font-bold transition-all ${config.limit === group.id ? 'bg-amber-600 border-amber-400 text-white shadow-lg shadow-amber-900/20' : 'bg-slate-800/50 border-slate-700 text-slate-500 hover:text-slate-200'}`}>
                     {group.label}
                   </button>
                 ))}
               </div>
               <div className="relative">
                 <span className="absolute left-3 top-2.5 text-slate-500 text-xs font-mono select-none">--limit</span>
-                <input 
-                  type="text" 
-                  value={config.limit} 
-                  onChange={(e) => updateConfig({ limit: e.target.value })} 
-                  placeholder="Tous (all)" 
-                  className="w-full bg-slate-950 border border-slate-700 rounded-lg pl-20 pr-4 py-2 text-sm text-amber-400 font-mono focus:ring-1 focus:ring-amber-500 outline-none" 
-                />
+                <input type="text" value={config.limit} onChange={(e) => updateConfig({ limit: e.target.value })} placeholder="Tous (all)" className="w-full bg-slate-950 border border-slate-700 rounded-lg pl-20 pr-4 py-2 text-sm text-amber-400 font-mono focus:ring-1 focus:ring-amber-500 outline-none" />
               </div>
             </div>
           </section>
 
-          {/* 03 Phases with Tooltips */}
           <section>
             <h2 className="text-xl font-bold mb-6 flex items-center text-white">
               <span className="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-500 flex items-center justify-center mr-3 text-sm">03</span>
               Phase de Déploiement
             </h2>
-
             <div className="bg-slate-900/40 p-6 rounded-2xl border border-slate-800 space-y-8">
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {PHASES.map(phase => (
-                  <PhaseButton 
-                    key={phase.value} 
-                    phase={phase} 
-                    isActive={config.phase === phase.value}
-                    onClick={() => handlePhaseSelect(phase.value)}
-                  />
+                  <PhaseButton key={phase.value} phase={phase} isActive={config.phase === phase.value} onClick={() => handlePhaseSelect(phase.value)} />
                 ))}
               </div>
-
               <div className="space-y-4">
                 <label className="text-sm font-semibold text-slate-400 uppercase tracking-widest flex justify-between">
                   <span>Tags Spécifiques (Survol pour aide)</span>
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {SPECIFIC_TAGS.map(tag => (
-                    <TagBadge 
-                      key={tag.id} 
-                      tag={tag} 
-                      isSelected={config.tags.includes(tag.id)} 
-                      onClick={() => toggleSpecificTag(tag.id)} 
-                    />
+                    <TagBadge key={tag.id} tag={tag} isSelected={config.tags.includes(tag.id)} onClick={() => toggleSpecificTag(tag.id)} />
                   ))}
                 </div>
-              </div>
-
-              <div className="pt-4 border-t border-slate-800 flex flex-wrap gap-2 min-h-[40px]">
-                 <span className="text-[10px] text-slate-600 w-full mb-1 uppercase tracking-tighter">Tags sélectionnés :</span>
-                 {config.tags.length === 0 ? (
-                   <span className="text-xs text-slate-700 italic">Aucun tag (exécution totale)</span>
-                 ) : (
-                   config.tags.map((tag, i) => (
-                      <span key={i} className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded text-[10px] font-mono flex items-center">
-                        {tag}
-                        <button onClick={() => removeTag('tags', i)} className="ml-1.5 hover:text-white transition-colors">×</button>
-                      </span>
-                   ))
-                 )}
               </div>
             </div>
           </section>
 
-          {/* Advanced Section */}
           <section>
-             <button 
-              onClick={() => setShowAdvanced(!showAdvanced)}
-              className="flex items-center space-x-2 text-slate-500 hover:text-indigo-400 transition-colors mb-4 group"
-             >
+             <button onClick={() => setShowAdvanced(!showAdvanced)} className="flex items-center space-x-2 text-slate-500 hover:text-indigo-400 transition-colors mb-4 group">
                 <span className={`transition-transform duration-300 ${showAdvanced ? 'rotate-90' : ''}`}>▶</span>
-                <span className="text-xs font-bold uppercase tracking-widest">Options Ansible Avancées</span>
+                <span className="text-xs font-bold uppercase tracking-widest">Options Ansible Avancées & Secrets</span>
              </button>
 
              {showAdvanced && (
-               <div className="space-y-6 bg-indigo-950/20 p-6 rounded-2xl border border-indigo-500/20 animate-in fade-in slide-in-from-top-4 duration-300">
+               <div className="space-y-8 bg-indigo-950/20 p-8 rounded-3xl border border-indigo-500/20 animate-in fade-in slide-in-from-top-4 duration-300">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label className="text-xs font-medium text-slate-400">Remote User (-u)</label>
-                      <input type="text" value={config.remoteUser} onChange={(e) => updateConfig({ remoteUser: e.target.value })} placeholder="ex: datafari" className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-2 text-sm text-slate-200 focus:ring-1 focus:ring-indigo-500 outline-none" />
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
+                        <span className="mr-2">🔐</span> Vault Password
+                      </label>
+                      <input type="password" value={config.vaultPassword} onChange={(e) => updateConfig({ vaultPassword: e.target.value })} placeholder="••••••••••••" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-rose-400 font-mono focus:ring-1 focus:ring-rose-500 outline-none transition-all" />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs font-medium text-slate-400">Parallel Forks (-f)</label>
-                      <input type="number" value={config.forks} onChange={(e) => updateConfig({ forks: parseInt(e.target.value) || 0 })} className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-2 text-sm text-slate-200 focus:ring-1 focus:ring-indigo-500 outline-none" />
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
+                        <span className="mr-2">👤</span> Remote User (-u)
+                      </label>
+                      <input type="text" value={config.remoteUser} onChange={(e) => updateConfig({ remoteUser: e.target.value })} placeholder="ex: datafari" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:ring-1 focus:ring-indigo-500 outline-none" />
                     </div>
                   </div>
-                  <div className="flex items-center space-x-12 pt-2">
-                    <label className="flex items-center space-x-3 cursor-pointer group">
-                        <div className={`w-12 h-6 rounded-full transition-all relative ${config.verbose ? 'bg-indigo-600' : 'bg-slate-700'}`}>
-                          <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${config.verbose ? 'left-7' : 'left-1'}`} />
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
+                        <span className="mr-2">🏁</span> Start at Task
+                      </label>
+                      <input type="text" value={config.startAtTask} onChange={(e) => updateConfig({ startAtTask: e.target.value })} placeholder="Nom exact de la tâche..." className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-emerald-400 font-mono focus:ring-1 focus:ring-indigo-500 outline-none" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
+                        <span className="mr-2">➕</span> Extra Vars (-e)
+                      </label>
+                      <input type="text" value={config.extraVarsRaw} onChange={(e) => updateConfig({ extraVarsRaw: e.target.value })} placeholder="key1=val1 key2=val2" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-amber-400 font-mono focus:ring-1 focus:ring-amber-500 outline-none" />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Forks (-f)</label>
+                      <input type="number" value={config.forks || ''} onChange={(e) => updateConfig({ forks: parseInt(e.target.value) || 0 })} placeholder="0 (Auto)" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2 text-sm text-slate-200 focus:ring-1 focus:ring-indigo-500 outline-none" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">SSH Timeout (s)</label>
+                      <input type="number" value={config.timeout || ''} onChange={(e) => updateConfig({ timeout: parseInt(e.target.value) || 0 })} placeholder="Par défaut (10s)" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2 text-sm text-slate-200 focus:ring-1 focus:ring-indigo-500 outline-none" />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-6 pt-4 border-t border-indigo-500/20">
+                    {[
+                      { label: "Verbose (-vvv)", key: "verbose", color: "bg-indigo-600" },
+                      { label: "Dry Run (--check)", key: "checkMode", color: "bg-amber-600" },
+                      { label: "Diff (--diff)", key: "diff", color: "bg-emerald-600" },
+                      { label: "Step Mode (--step)", key: "step", color: "bg-rose-600" },
+                      { label: "Syntax Check", key: "syntaxCheck", color: "bg-slate-600" },
+                      { label: "List Tasks", key: "listTasks", color: "bg-slate-600" },
+                    ].map((toggle) => (
+                      <label key={toggle.key} className="flex items-center space-x-3 cursor-pointer group">
+                        <div className={`w-10 h-5 rounded-full transition-all relative ${config[toggle.key as keyof CommandConfig] ? toggle.color : 'bg-slate-700'}`}>
+                          <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${config[toggle.key as keyof CommandConfig] ? 'left-5.5' : 'left-0.5'}`} />
                         </div>
-                        <input type="checkbox" className="hidden" checked={config.verbose} onChange={() => updateConfig({ verbose: !config.verbose })} />
-                        <span className="text-xs font-medium text-slate-400 group-hover:text-slate-200 transition-colors">Verbose (-vvv)</span>
-                    </label>
-                    <label className="flex items-center space-x-3 cursor-pointer group">
-                        <div className={`w-12 h-6 rounded-full transition-all relative ${config.checkMode ? 'bg-amber-600' : 'bg-slate-700'}`}>
-                          <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${config.checkMode ? 'left-7' : 'left-1'}`} />
-                        </div>
-                        <input type="checkbox" className="hidden" checked={config.checkMode} onChange={() => updateConfig({ checkMode: !config.checkMode })} />
-                        <span className="text-xs font-medium text-slate-400 group-hover:text-slate-200 transition-colors">Dry Run (--check)</span>
-                    </label>
+                        <input type="checkbox" className="hidden" checked={!!config[toggle.key as keyof CommandConfig]} onChange={() => updateConfig({ [toggle.key]: !config[toggle.key as keyof CommandConfig] })} />
+                        <span className="text-[10px] font-bold text-slate-400 group-hover:text-slate-200 transition-colors uppercase tracking-widest">{toggle.label}</span>
+                      </label>
+                    ))}
                   </div>
                </div>
              )}
           </section>
         </div>
 
-        {/* Output Column */}
         <div className="lg:col-span-5 relative">
           <div className="sticky top-24">
             <h2 className="text-xl font-bold mb-6 flex items-center text-white">
               <span className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-500 flex items-center justify-center mr-3 text-sm">04</span>
               Commande Ansible
             </h2>
-            
             <CommandDisplay config={config} />
-
             <div className="mt-8 p-6 bg-slate-900/50 rounded-2xl border border-slate-800 space-y-4 shadow-xl">
               <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-2">Résumé d'Exécution</h3>
               <div className="grid grid-cols-2 gap-4 text-xs">
                 <div className="space-y-1">
                   <span className="text-slate-500 block">Environnement</span>
-                  <span className={`font-bold px-2 py-0.5 rounded text-white ${ENVIRONMENTS.find(e => e.value === config.environment)?.color}`}>
-                    {config.environment.toUpperCase()}
-                  </span>
+                  <span className={`font-bold px-2 py-0.5 rounded text-white ${ENVIRONMENTS.find(e => e.value === config.environment)?.color}`}>{config.environment.toUpperCase()}</span>
                 </div>
                 <div className="space-y-1">
                   <span className="text-slate-500 block">Limit Target</span>
                   <span className="text-amber-400 font-mono font-bold uppercase">{config.limit || 'ALL'}</span>
                 </div>
                 <div className="space-y-1">
-                  <span className="text-slate-500 block">Opération</span>
-                  <span className="text-indigo-400 font-bold uppercase">
-                    {PHASES.find(p => p.value === config.phase)?.label || 'MANUAL'}
-                  </span>
+                  <span className="text-slate-500 block">Vault Mode</span>
+                  <span className={`font-bold uppercase font-mono ${config.vaultPassword ? 'text-emerald-400' : 'text-rose-500'}`}>{config.vaultPassword ? 'PROTECTED (PWD)' : 'ASK-PASS'}</span>
                 </div>
                 <div className="space-y-1">
-                  <span className="text-slate-500 block">Vault</span>
-                  <span className="text-rose-500 font-bold uppercase font-mono">--ask-vault-pass</span>
+                  <span className="text-slate-500 block">Timeout</span>
+                  <span className="text-indigo-400 font-bold">{config.timeout > 0 ? `${config.timeout}s` : 'Défaut'}</span>
                 </div>
-              </div>
-
-              <div className="mt-4 pt-4 border-t border-slate-800">
-                 <div className="p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-lg flex space-x-3 items-start">
-                   <span className="text-lg leading-none mt-0.5">⚠️</span>
-                   <p className="text-[10px] text-indigo-400 leading-relaxed italic">
-                     Cette commande génère l'archive de livraison <code>installation-YYYYMMDD.tar.gz</code> pour le répertoire SPWSI.
-                   </p>
-                 </div>
               </div>
             </div>
           </div>
@@ -447,37 +387,10 @@ export default function App() {
          <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-[10px] text-slate-600 font-mono uppercase tracking-widest">
             <p>© 2025 MOGEND Command Forge — SPWSI / M472</p>
             <div className="flex flex-wrap justify-center gap-4 mt-4 md:mt-0">
-               <button 
-                 onClick={() => setIsRptModalOpen(true)}
-                 className="flex items-center space-x-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 px-4 py-2 rounded-xl border border-emerald-500/30 transition-all font-bold uppercase tracking-widest text-[9px] shadow-lg shadow-emerald-500/10"
-               >
-                 <span>📄</span>
-                 <span>Rapport Technique (RPT)</span>
-               </button>
-               <button 
-                 onClick={() => setIsMaintenanceModalOpen(true)}
-                 className="flex items-center space-x-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 px-4 py-2 rounded-xl border border-amber-500/30 transition-all font-bold uppercase tracking-widest text-[9px]"
-               >
-                 <span>🛠️</span>
-                 <span>Scripts Maintenance</span>
-               </button>
-               <button 
-                 onClick={() => setIsUserGuideModalOpen(true)}
-                 className="flex items-center space-x-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 px-4 py-2 rounded-xl border border-indigo-500/30 transition-all font-bold uppercase tracking-widest text-[9px]"
-               >
-                 <span>📙</span>
-                 <span>Guide Utilisateur</span>
-               </button>
-               <button 
-                 onClick={() => setIsProjectInfoModalOpen(true)}
-                 className="flex items-center space-x-2 bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-xl border border-slate-700 transition-all font-bold uppercase tracking-widest text-[9px]"
-               >
-                 <span>📊</span>
-                 <span>Infos Projet</span>
-               </button>
-               <div className="flex items-center space-x-8 px-4">
-                 <span className="flex items-center font-bold text-slate-400 italic">Plateforme MORICE / Datafari</span>
-               </div>
+               <button onClick={() => setIsRptModalOpen(true)} className="flex items-center space-x-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 px-4 py-2 rounded-xl border border-emerald-500/30 transition-all font-bold uppercase tracking-widest text-[9px]"><span>📄</span><span>RPT Technical</span></button>
+               <button onClick={() => setIsMaintenanceModalOpen(true)} className="flex items-center space-x-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 px-4 py-2 rounded-xl border border-amber-500/30 transition-all font-bold uppercase tracking-widest text-[9px]"><span>🛠️</span><span>Maintenance</span></button>
+               <button onClick={() => setIsUserGuideModalOpen(true)} className="flex items-center space-x-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 px-4 py-2 rounded-xl border border-indigo-500/30 transition-all font-bold uppercase tracking-widest text-[9px]"><span>📙</span><span>User Guide</span></button>
+               <button onClick={() => setIsProjectInfoModalOpen(true)} className="flex items-center space-x-2 bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-xl border border-slate-700 transition-all font-bold uppercase tracking-widest text-[9px]"><span>📊</span><span>Project Info</span></button>
             </div>
          </div>
       </footer>

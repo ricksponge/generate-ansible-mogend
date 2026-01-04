@@ -23,6 +23,7 @@ export interface CommandConfig {
   tags: string[];
   skipTags: string[];
   extraVars: Record<string, string>;
+  extraVarsRaw?: string;
   // Advanced parameters
   limit?: string;
   forks?: number;
@@ -30,6 +31,12 @@ export interface CommandConfig {
   remoteUser?: string;
   become?: boolean;
   startAtTask?: string;
+  step?: boolean;
+  syntaxCheck?: boolean;
+  listTasks?: boolean;
+  listTags?: boolean;
+  timeout?: number;
+  vaultPassword?: string;
   // M472 Specifics
   phase?: string;
 }

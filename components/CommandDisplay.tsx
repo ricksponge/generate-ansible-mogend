@@ -31,32 +31,41 @@ const CommandDisplay: React.FC<CommandDisplayProps> = ({ config }) => {
       cmd += ` --skip-tags "${config.skipTags.join(',')}"`;
     }
 
-    // Vault (Mandatory for M472)
-    cmd += ` --ask-vault-pass`;
+    // Vault handling - Only if explicitly filled
+    if (config.vaultPassword && config.vaultPassword.trim().length > 0) {
+      cmd = `echo "${config.vaultPassword}" > .vault_pass && ` + cmd + ` --vault-password-file .vault_pass && rm .vault_pass`;
+    } else {
+      cmd += ` --ask-vault-pass`;
+    }
 
-    // Advanced Flags
+    // Advanced Flags - Only if > 0 or not empty
     if (config.forks && config.forks > 0) {
       cmd += ` -f ${config.forks}`;
+    }
+
+    if (config.timeout && config.timeout > 0) {
+      cmd += ` --timeout ${config.timeout}`;
     }
 
     if (config.remoteUser) {
       cmd += ` -u ${config.remoteUser}`;
     }
 
-    if (config.verbose) {
-      cmd += ` -vvv`;
-    }
-
-    if (config.checkMode) {
-      cmd += ` --check`;
-    }
-
-    if (config.diff) {
-      cmd += ` --diff`;
-    }
+    // Toggles
+    if (config.verbose) cmd += ` -vvv`;
+    if (config.checkMode) cmd += ` --check`;
+    if (config.diff) cmd += ` --diff`;
+    if (config.step) cmd += ` --step`;
+    if (config.syntaxCheck) cmd += ` --syntax-check`;
+    if (config.listTasks) cmd += ` --list-tasks`;
+    if (config.listTags) cmd += ` --list-tags`;
 
     if (config.startAtTask) {
       cmd += ` --start-at-task "${config.startAtTask}"`;
+    }
+
+    if (config.extraVarsRaw) {
+      cmd += ` -e "${config.extraVarsRaw}"`;
     }
 
     return cmd;

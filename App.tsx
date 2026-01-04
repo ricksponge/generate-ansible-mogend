@@ -99,6 +99,37 @@ export default function App() {
     updateConfig({ tags: newTags, phase: newPhase });
   };
 
+  // Nouvelle logique pour la sélection multiple du Limit
+  const handleLimitToggle = (groupId: string) => {
+    const currentLimits = config.limit ? config.limit.split(',').map(l => l.trim()) : [];
+    let newLimits: string[] = [];
+
+    if (groupId === 'all') {
+      newLimits = ['all'];
+    } else {
+      // Retirer 'all' si on sélectionne un groupe spécifique
+      const filtered = currentLimits.filter(l => l !== 'all' && l !== '');
+      
+      if (filtered.includes(groupId)) {
+        newLimits = filtered.filter(l => l !== groupId);
+      } else {
+        newLimits = [...filtered, groupId];
+      }
+      
+      // Si on a tout déselectionné, remettre 'all' par défaut
+      if (newLimits.length === 0) {
+        newLimits = ['all'];
+      }
+    }
+    
+    updateConfig({ limit: newLimits.join(',') });
+  };
+
+  const isLimitSelected = (groupId: string) => {
+    const currentLimits = config.limit ? config.limit.split(',').map(l => l.trim()) : [];
+    return currentLimits.includes(groupId);
+  };
+
   const currentFrontendUrl = FRONTEND_LINKS[config.environment] || FRONTEND_LINKS.qual;
 
   return (
@@ -206,8 +237,12 @@ export default function App() {
             <div className="bg-slate-900/40 p-6 rounded-2xl border border-slate-800 space-y-4 shadow-xl">
               <div className="flex flex-wrap gap-2">
                 {COMMON_GROUPS.map(group => (
-                  <button key={group.id} onClick={() => updateConfig({ limit: group.id })} className={`px-4 py-2 rounded-lg border text-xs font-bold transition-all ${config.limit === group.id ? 'bg-amber-600 border-amber-400 text-white shadow-lg shadow-amber-900/20' : 'bg-slate-800/50 border-slate-700 text-slate-500 hover:text-slate-200'}`}>
-                    {group.label}
+                  <button 
+                    key={group.id} 
+                    onClick={() => handleLimitToggle(group.id)} 
+                    className={`px-4 py-2 rounded-lg border text-xs font-bold transition-all ${isLimitSelected(group.id) ? 'bg-amber-600 border-amber-400 text-white shadow-lg shadow-amber-900/20' : 'bg-slate-800/50 border-slate-700 text-slate-500 hover:text-slate-200'}`}
+                  >
+                    {group.label} {isLimitSelected(group.id) && group.id !== 'all' && <span className="ml-1 opacity-50">×</span>}
                   </button>
                 ))}
               </div>

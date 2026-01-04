@@ -10,6 +10,7 @@ import ProjectInfoModal from './components/ProjectInfoModal';
 import UserGuideModal from './components/UserGuideModal';
 import MaintenanceScriptsModal from './components/MaintenanceScriptsModal';
 import TechnicalReportModal from './components/TechnicalReportModal';
+import UsefulLinksModal from './components/UsefulLinksModal';
 
 const INITIAL_CONFIG: CommandConfig = {
   project: PROJECTS[0].id,
@@ -128,6 +129,7 @@ export default function App() {
   const [isUserGuideModalOpen, setIsUserGuideModalOpen] = useState(false);
   const [isMaintenanceModalOpen, setIsMaintenanceModalOpen] = useState(false);
   const [isRptModalOpen, setIsRptModalOpen] = useState(false);
+  const [isUsefulLinksModalOpen, setIsUsefulLinksModalOpen] = useState(false);
 
   const updateConfig = (updates: Partial<CommandConfig>) => {
     setConfig(prev => ({ ...prev, ...updates }));
@@ -167,6 +169,7 @@ export default function App() {
       <UserGuideModal isOpen={isUserGuideModalOpen} onClose={() => setIsUserGuideModalOpen(false)} />
       <MaintenanceScriptsModal isOpen={isMaintenanceModalOpen} onClose={() => setIsMaintenanceModalOpen(false)} />
       <TechnicalReportModal isOpen={isRptModalOpen} onClose={() => setIsRptModalOpen(false)} initialEnv={config.environment} />
+      <UsefulLinksModal isOpen={isUsefulLinksModalOpen} onClose={() => setIsUsefulLinksModalOpen(false)} />
       
       <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
@@ -421,6 +424,7 @@ export default function App() {
          <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-[10px] text-slate-600 font-mono uppercase tracking-widest">
             <p>© 2025 MOGEND Command Forge — SPWSI / M472</p>
             <div className="flex flex-wrap justify-center gap-4 mt-4 md:mt-0">
+               <button onClick={() => setIsUsefulLinksModalOpen(true)} className="flex items-center space-x-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 px-4 py-2 rounded-xl border border-blue-500/30 transition-all font-bold uppercase tracking-widest text-[9px]"><span>🔗</span><span>Liens Utiles</span></button>
                <button onClick={() => setIsRptModalOpen(true)} className="flex items-center space-x-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 px-4 py-2 rounded-xl border border-emerald-500/30 transition-all font-bold uppercase tracking-widest text-[9px]"><span>📄</span><span>RPT Technical</span></button>
                <button onClick={() => setIsMaintenanceModalOpen(true)} className="flex items-center space-x-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 px-4 py-2 rounded-xl border border-amber-500/30 transition-all font-bold uppercase tracking-widest text-[9px]"><span>🛠️</span><span>Maintenance</span></button>
                <button onClick={() => setIsUserGuideModalOpen(true)} className="flex items-center space-x-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 px-4 py-2 rounded-xl border border-indigo-500/30 transition-all font-bold uppercase tracking-widest text-[9px]"><span>📙</span><span>User Guide</span></button>

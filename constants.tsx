@@ -8,6 +8,11 @@ export interface PhaseConfig {
   description: string;
 }
 
+export interface TagConfig {
+  id: string;
+  description: string;
+}
+
 export const PROJECTS: DeploymentProject[] = [
   { id: 'datafari-core', name: 'Datafari Core', icon: '🔍', playbook: 'install.yml' },
   { id: 'frontend-ui', name: 'Frontend MORICE', icon: '🎨', playbook: 'install.yml' },
@@ -87,11 +92,29 @@ export const COMMON_GROUPS = [
   { id: 'mcf2', label: 'MCF2' },
 ];
 
-export const SPECIFIC_TAGS = [
-  'uninstall', 'ssh', 'finger', 'java_env', 'replace_certs', 
-  'verif_certilibre', 'datafari_properties', 'application_properties', 
-  'build_front', 'sidebar', 'tika', 'apache_sso_cors', 'monitor_script', 
-  'nftables', 'fetch_log', 'lancement', 'widget', 'solr', 'mcf', 'verif', 'copie', 'logs'
+export const SPECIFIC_TAGS: TagConfig[] = [
+  { id: 'uninstall', description: 'Désinstallation maîtrisée de Datafari (arrêt services, nettoyage).' },
+  { id: 'ssh', description: 'Durcissement de l’accès SSH métier sur le port 2222.' },
+  { id: 'finger', description: 'Distribution des clés SSH et configuration des empreintes serveurs.' },
+  { id: 'java_env', description: 'Normalisation de l’environnement Java Temurin (JAVA_HOME).' },
+  { id: 'replace_certs', description: 'Rotation et déploiement multi-serveurs des certificats TLS.' },
+  { id: 'verif_certilibre', description: 'Contrôle de la chaîne de confiance et compatibilité SSO Certilibre.' },
+  { id: 'datafari_properties', description: 'Configuration structurante du cœur Datafari (API, endpoints).' },
+  { id: 'application_properties', description: 'Configuration applicative Java fine (Webapp Datafari).' },
+  { id: 'build_front', description: 'Génération et déploiement des assets de l’interface utilisateur.' },
+  { id: 'sidebar', description: 'Personnalisation de la barre latérale JSP (branding, liens métiers).' },
+  { id: 'tika', description: 'Configuration d’Apache Tika pour l’OCR et le parsing documentaire.' },
+  { id: 'apache_sso_cors', description: 'Intégration SSO (ProxyMA/LLNG) et gestion des en-têtes CORS.' },
+  { id: 'monitor_script', description: 'Déploiement des scripts de supervision locale (services, ports).' },
+  { id: 'nftables', description: 'Configuration du pare-feu nftables (segmentation réseau).' },
+  { id: 'fetch_log', description: 'Collecte et rapatriement des journaux techniques Datafari.' },
+  { id: 'lancement', description: 'Playbook orchestrateur principal (chargement variables, rôles).' },
+  { id: 'widget', description: 'Déploiement des widgets de liens métiers pour l’interface.' },
+  { id: 'solr', description: 'Configuration et maintenance spécifique du moteur SolrCloud.' },
+  { id: 'mcf', description: 'Configuration ManifoldCF (connecteurs, jobs d’indexation).' },
+  { id: 'verif', description: 'Vérifications techniques post-action (processus, ports).' },
+  { id: 'copie', description: 'Transfert sécurisé du binaire .deb Datafari sur les cibles.' },
+  { id: 'logs', description: 'Archivage et export des logs vers le stockage externe.' }
 ];
 
 export const ACTIONS = [

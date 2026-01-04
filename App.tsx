@@ -60,6 +60,42 @@ const PhaseButton: React.FC<PhaseButtonProps> = ({ phase, isActive, onClick }) =
   );
 };
 
+interface TagBadgeProps {
+  tag: { id: string, description: string };
+  isSelected: boolean;
+  onClick: () => void;
+}
+
+const TagBadge: React.FC<TagBadgeProps> = ({ tag, isSelected, onClick }) => {
+  const [showTooltip, setShowTooltip] = useState(false);
+
+  return (
+    <div className="relative inline-block">
+      <button
+        onMouseEnter={() => setShowTooltip(true)}
+        onMouseLeave={() => setShowTooltip(false)}
+        onClick={onClick}
+        className={`px-3 py-1 rounded-full text-[10px] font-mono border transition-all ${
+          isSelected
+          ? 'bg-indigo-600 border-indigo-400 text-white shadow-lg shadow-indigo-900/40'
+          : 'bg-slate-800 border-slate-700 text-slate-500 hover:text-slate-300 hover:border-slate-500'
+        }`}
+      >
+        {tag.id}
+      </button>
+      
+      {showTooltip && (
+        <div className="absolute z-[100] bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-900 border border-slate-700 rounded shadow-2xl animate-in fade-in zoom-in-95 duration-150 pointer-events-none">
+          <p className="text-[10px] text-slate-300 leading-tight">
+            {tag.description}
+          </p>
+          <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-700"></div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 export default function App() {
   const [config, setConfig] = useState<CommandConfig>(INITIAL_CONFIG);
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -86,6 +122,13 @@ export default function App() {
     });
   };
 
+  const toggleSpecificTag = (tagId: string) => {
+    const newTags = config.tags.includes(tagId) 
+      ? config.tags.filter(t => t !== tagId) 
+      : [...config.tags, tagId];
+    updateConfig({ tags: newTags, phase: 'custom' });
+  };
+
   return (
     <div className="min-h-screen pb-20 bg-slate-950 text-slate-200">
       {/* Header */}
@@ -101,7 +144,7 @@ export default function App() {
             </div>
           </div>
           <div className="flex items-center space-x-4">
-             <span className="text-[10px] bg-slate-800 text-slate-400 px-2 py-1 rounded font-mono border border-slate-700">STABLE v3.1</span>
+             <span className="text-[10px] bg-slate-800 text-slate-400 px-2 py-1 rounded font-mono border border-slate-700">STABLE v3.2</span>
           </div>
         </div>
       </header>
@@ -217,26 +260,16 @@ export default function App() {
 
               <div className="space-y-4">
                 <label className="text-sm font-semibold text-slate-400 uppercase tracking-widest flex justify-between">
-                  <span>Tags Spécifiques</span>
+                  <span>Tags Spécifiques (Survol pour aide)</span>
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {SPECIFIC_TAGS.map(tag => (
-                    <button
-                      key={tag}
-                      onClick={() => {
-                        const newTags = config.tags.includes(tag) 
-                          ? config.tags.filter(t => t !== tag) 
-                          : [...config.tags, tag];
-                        updateConfig({ tags: newTags, phase: 'custom' });
-                      }}
-                      className={`px-3 py-1 rounded-full text-[10px] font-mono border transition-all ${
-                        config.tags.includes(tag)
-                        ? 'bg-indigo-600 border-indigo-400 text-white'
-                        : 'bg-slate-800 border-slate-700 text-slate-500 hover:text-slate-300'
-                      }`}
-                    >
-                      {tag}
-                    </button>
+                    <TagBadge 
+                      key={tag.id} 
+                      tag={tag} 
+                      isSelected={config.tags.includes(tag.id)} 
+                      onClick={() => toggleSpecificTag(tag.id)} 
+                    />
                   ))}
                 </div>
               </div>

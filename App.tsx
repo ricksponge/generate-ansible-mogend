@@ -199,8 +199,9 @@ export default function App() {
                <span className="text-sm">📖</span>
                <span>Doc</span>
              </button>
-             <button onClick={() => setIsConfigModalOpen(true)} className="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest border border-slate-700 transition-all">
-               Cfg
+             <button onClick={() => setIsConfigModalOpen(true)} className="flex items-center space-x-2 text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest border border-slate-700 transition-all">
+               <span className="text-sm">⚙️</span>
+               <span>Cfg</span>
              </button>
              <span className="text-[10px] bg-slate-800 text-slate-400 px-2 py-1.5 rounded-lg font-mono border border-slate-700">v3.5</span>
           </div>

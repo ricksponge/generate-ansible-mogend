@@ -9,6 +9,7 @@ import ArchitectureModal from './components/ArchitectureModal';
 import ProjectInfoModal from './components/ProjectInfoModal';
 import UserGuideModal from './components/UserGuideModal';
 import MaintenanceScriptsModal from './components/MaintenanceScriptsModal';
+import TechnicalReportModal from './components/TechnicalReportModal';
 
 const INITIAL_CONFIG: CommandConfig = {
   project: PROJECTS[0].id,
@@ -113,6 +114,7 @@ export default function App() {
   const [isProjectInfoModalOpen, setIsProjectInfoModalOpen] = useState(false);
   const [isUserGuideModalOpen, setIsUserGuideModalOpen] = useState(false);
   const [isMaintenanceModalOpen, setIsMaintenanceModalOpen] = useState(false);
+  const [isRptModalOpen, setIsRptModalOpen] = useState(false);
 
   const updateConfig = (updates: Partial<CommandConfig>) => {
     setConfig(prev => ({ ...prev, ...updates }));
@@ -155,6 +157,7 @@ export default function App() {
       <ProjectInfoModal isOpen={isProjectInfoModalOpen} onClose={() => setIsProjectInfoModalOpen(false)} />
       <UserGuideModal isOpen={isUserGuideModalOpen} onClose={() => setIsUserGuideModalOpen(false)} />
       <MaintenanceScriptsModal isOpen={isMaintenanceModalOpen} onClose={() => setIsMaintenanceModalOpen(false)} />
+      <TechnicalReportModal isOpen={isRptModalOpen} onClose={() => setIsRptModalOpen(false)} initialEnv={config.environment} />
       
       {/* Header */}
       <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
@@ -170,6 +173,13 @@ export default function App() {
           </div>
           <div className="flex items-center space-x-3">
              <button 
+               onClick={() => setIsRptModalOpen(true)}
+               className="group flex items-center space-x-2 text-[10px] bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest border border-emerald-500/30 transition-all shadow-lg shadow-emerald-500/10"
+             >
+               <span className="text-sm">📄</span>
+               <span>RPT Tech</span>
+             </button>
+             <button 
                onClick={() => setIsArchiModalOpen(true)}
                className="group flex items-center space-x-2 text-[10px] bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest border border-indigo-500/30 transition-all"
              >
@@ -178,23 +188,23 @@ export default function App() {
              </button>
              <button 
                onClick={handleDownloadRepo}
-               className="group flex items-center space-x-2 text-[10px] bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest border border-emerald-500/30 transition-all"
+               className="group flex items-center space-x-2 text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest border border-slate-700 transition-all"
              >
                <span className="text-sm">📥</span>
-               <span>Dépôt Ansible</span>
+               <span>Ansible</span>
              </button>
              <button 
                onClick={() => setIsReadmeModalOpen(true)}
                className="group flex items-center space-x-2 text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest border border-slate-700 transition-all"
              >
                <span className="text-sm">📖</span>
-               <span>Documentation</span>
+               <span>Doc</span>
              </button>
              <button 
                onClick={() => setIsConfigModalOpen(true)}
                className="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest border border-slate-700 transition-all"
              >
-               Ansible CFG
+               Cfg
              </button>
              <span className="text-[10px] bg-slate-800 text-slate-400 px-2 py-1.5 rounded-lg font-mono border border-slate-700">v3.5</span>
           </div>
@@ -438,6 +448,13 @@ export default function App() {
             <p>© 2025 MOGEND Command Forge — SPWSI / M472</p>
             <div className="flex flex-wrap justify-center gap-4 mt-4 md:mt-0">
                <button 
+                 onClick={() => setIsRptModalOpen(true)}
+                 className="flex items-center space-x-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 px-4 py-2 rounded-xl border border-emerald-500/30 transition-all font-bold uppercase tracking-widest text-[9px] shadow-lg shadow-emerald-500/10"
+               >
+                 <span>📄</span>
+                 <span>Rapport Technique (RPT)</span>
+               </button>
+               <button 
                  onClick={() => setIsMaintenanceModalOpen(true)}
                  className="flex items-center space-x-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 px-4 py-2 rounded-xl border border-amber-500/30 transition-all font-bold uppercase tracking-widest text-[9px]"
                >
@@ -446,20 +463,19 @@ export default function App() {
                </button>
                <button 
                  onClick={() => setIsUserGuideModalOpen(true)}
-                 className="flex items-center space-x-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 px-4 py-2 rounded-xl border border-emerald-500/30 transition-all font-bold uppercase tracking-widest text-[9px]"
+                 className="flex items-center space-x-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 px-4 py-2 rounded-xl border border-indigo-500/30 transition-all font-bold uppercase tracking-widest text-[9px]"
                >
                  <span>📙</span>
                  <span>Guide Utilisateur</span>
                </button>
                <button 
                  onClick={() => setIsProjectInfoModalOpen(true)}
-                 className="flex items-center space-x-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 px-4 py-2 rounded-xl border border-indigo-500/30 transition-all font-bold uppercase tracking-widest text-[9px]"
+                 className="flex items-center space-x-2 bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-xl border border-slate-700 transition-all font-bold uppercase tracking-widest text-[9px]"
                >
                  <span>📊</span>
-                 <span>Présentation Projet</span>
+                 <span>Infos Projet</span>
                </button>
                <div className="flex items-center space-x-8 px-4">
-                 <span className="flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-2"></span> System Ready</span>
                  <span className="flex items-center font-bold text-slate-400 italic">Plateforme MORICE / Datafari</span>
                </div>
             </div>

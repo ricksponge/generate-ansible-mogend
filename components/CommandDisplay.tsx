@@ -14,69 +14,77 @@ const CommandDisplay: React.FC<CommandDisplayProps> = ({ config }) => {
   const [isTerminalModalOpen, setIsTerminalModalOpen] = useState(false);
 
   const generateCommand = () => {
-    // According to M472 script logic
+    // 1. Définition des briques de base
     const playbook = 'playbooks/install.yml';
     const inventory = `inventories/${config.environment}/inventory.ini`;
     
-    let baseCmd = `ansible-playbook ${playbook} -i ${inventory}`;
+    // 2. Construction de la liste des arguments Ansible
+    const args: string[] = [];
     
-    // Target constraint
+    args.push(playbook);
+    args.push(`-i ${inventory}`);
+    
     if (config.limit && config.limit !== 'all') {
-      baseCmd += ` -l "${config.limit}"`;
+      args.push(`-l "${config.limit}"`);
     }
 
-    // Tags handling
     if (config.tags && config.tags.length > 0) {
-      baseCmd += ` --tags "${config.tags.join(',')}"`;
+      args.push(`--tags "${config.tags.join(',')}"`);
     }
 
     if (config.skipTags && config.skipTags.length > 0) {
-      baseCmd += ` --skip-tags "${config.skipTags.join(',')}"`;
+      args.push(`--skip-tags "${config.skipTags.join(',')}"`);
     }
 
-    // Vault handling - Only if explicitly filled
-    if (config.vaultPassword && config.vaultPassword.trim().length > 0) {
-      baseCmd = `echo "${config.vaultPassword}" > .vault_pass && ` + baseCmd + ` --vault-password-file .vault_pass && rm .vault_pass`;
+    // Gestion Vault au sein d'Ansible
+    const hasVault = config.vaultPassword && config.vaultPassword.trim().length > 0;
+    if (hasVault) {
+      args.push(`--vault-password-file .vault_pass`);
     } else {
-      baseCmd += ` --ask-vault-pass`;
+      args.push(`--ask-vault-pass`);
     }
 
-    // Advanced Flags - Only if > 0 or not empty
-    if (config.forks && config.forks > 0) {
-      baseCmd += ` -f ${config.forks}`;
-    }
+    // Paramètres avancés
+    if (config.forks && config.forks > 0) args.push(`-f ${config.forks}`);
+    if (config.timeout && config.timeout > 0) args.push(`--timeout ${config.timeout}`);
+    if (config.remoteUser) args.push(`-u ${config.remoteUser}`);
+    if (config.verbose) args.push(`-vvv`);
+    if (config.checkMode) args.push(`--check`);
+    if (config.diff) args.push(`--diff`);
+    if (config.step) args.push(`--step`);
+    if (config.syntaxCheck) args.push(`--syntax-check`);
+    if (config.listTasks) args.push(`--list-tasks`);
+    if (config.listTags) args.push(`--list-tags`);
+    if (config.startAtTask) args.push(`--start-at-task "${config.startAtTask}"`);
+    if (config.extraVarsRaw) args.push(`-e "${config.extraVarsRaw}"`);
 
-    if (config.timeout && config.timeout > 0) {
-      baseCmd += ` --timeout ${config.timeout}`;
-    }
+    // 3. Assemblage de la commande Ansible seule (avec multi-ligne)
+    const ansiblePlaybookCmd = `ansible-playbook ${args.join(' \\\n  ')}`;
 
-    if (config.remoteUser) {
-      baseCmd += ` -u ${config.remoteUser}`;
-    }
+    // 4. Chaînage complet (Shell pipeline)
+    let finalCmd = "";
 
-    // Toggles
-    if (config.verbose) baseCmd += ` -vvv`;
-    if (config.checkMode) baseCmd += ` --check`;
-    if (config.diff) baseCmd += ` --diff`;
-    if (config.step) baseCmd += ` --step`;
-    if (config.syntaxCheck) baseCmd += ` --syntax-check`;
-    if (config.listTasks) baseCmd += ` --list-tasks`;
-    if (config.listTags) baseCmd += ` --list-tags`;
-
-    if (config.startAtTask) {
-      baseCmd += ` --start-at-task "${config.startAtTask}"`;
-    }
-
-    if (config.extraVarsRaw) {
-      baseCmd += ` -e "${config.extraVarsRaw}"`;
-    }
-
-    // MOGEND_HOME Prefix
+    // A. Contexte du répertoire
     if (config.useMogendHome) {
-      return `cd "$MOGEND_HOME" && \\\n${baseCmd}`;
+      finalCmd += `cd "$MOGEND_HOME" && \\\n`;
     }
 
-    return baseCmd;
+    // B. Préparation Vault (si applicable)
+    if (hasVault) {
+      finalCmd += `echo "${config.vaultPassword}" > .vault_pass && \\\n`;
+    }
+
+    // C. Exécution Ansible
+    finalCmd += ansiblePlaybookCmd;
+
+    // D. Nettoyage final (si applicable)
+    // On utilise && rm pour s'assurer que si ansible réussit, le fichier est supprimé.
+    // On pourrait utiliser ; rm pour être sûr, mais restons sur un chaînage cohérent.
+    if (hasVault) {
+      finalCmd += ` && \\\nrm -f .vault_pass`;
+    }
+
+    return finalCmd;
   };
 
   const command = generateCommand();

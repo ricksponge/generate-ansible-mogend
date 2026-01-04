@@ -32,12 +32,18 @@ const INITIAL_CONFIG: CommandConfig = {
   syntaxCheck: false,
   listTasks: false,
   listTags: false,
-  timeout: 0, // Désactivé par défaut
+  timeout: 0,
   vaultPassword: '',
   phase: 'phase_precheck'
 };
 
 const REPO_DOWNLOAD_URL = "https://omnibus-pic.gendarmerie.fr/spwsi/morice2/deploiement/-/archive/dev_lommere/deploiement-dev_lommere.tar.gz";
+
+const FRONTEND_LINKS: Record<string, string> = {
+  qual: "https://morice-qual.ppsso.gendarmerie.fr",
+  preprod: "https://morice-preprod.ppsso.gendarmerie.fr",
+  prod: "https://mogend.sso.gendarmerie.fr"
+};
 
 interface PhaseButtonProps {
   phase: any;
@@ -139,12 +145,6 @@ export default function App() {
     updateConfig({ phase, tags });
   };
 
-  const removeTag = (type: 'tags' | 'skipTags', index: number) => {
-    updateConfig({
-      [type]: (config[type] || []).filter((_, i) => i !== index)
-    });
-  };
-
   const toggleSpecificTag = (tagId: string) => {
     const newTags = config.tags.includes(tagId) 
       ? config.tags.filter(t => t !== tagId) 
@@ -155,6 +155,8 @@ export default function App() {
   const handleDownloadRepo = () => {
     window.open(REPO_DOWNLOAD_URL, '_blank');
   };
+
+  const currentFrontendUrl = FRONTEND_LINKS[config.environment] || FRONTEND_LINKS.qual;
 
   return (
     <div className="min-h-screen pb-20 bg-slate-950 text-slate-200">
@@ -352,33 +354,65 @@ export default function App() {
         </div>
 
         <div className="lg:col-span-5 relative">
-          <div className="sticky top-24">
-            <h2 className="text-xl font-bold mb-6 flex items-center text-white">
-              <span className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-500 flex items-center justify-center mr-3 text-sm">04</span>
-              Commande Ansible
-            </h2>
-            <CommandDisplay config={config} />
-            <div className="mt-8 p-6 bg-slate-900/50 rounded-2xl border border-slate-800 space-y-4 shadow-xl">
-              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-2">Résumé d'Exécution</h3>
-              <div className="grid grid-cols-2 gap-4 text-xs">
-                <div className="space-y-1">
-                  <span className="text-slate-500 block">Environnement</span>
-                  <span className={`font-bold px-2 py-0.5 rounded text-white ${ENVIRONMENTS.find(e => e.value === config.environment)?.color}`}>{config.environment.toUpperCase()}</span>
-                </div>
-                <div className="space-y-1">
-                  <span className="text-slate-500 block">Limit Target</span>
-                  <span className="text-amber-400 font-mono font-bold uppercase">{config.limit || 'ALL'}</span>
-                </div>
-                <div className="space-y-1">
-                  <span className="text-slate-500 block">Vault Mode</span>
-                  <span className={`font-bold uppercase font-mono ${config.vaultPassword ? 'text-emerald-400' : 'text-rose-500'}`}>{config.vaultPassword ? 'PROTECTED (PWD)' : 'ASK-PASS'}</span>
-                </div>
-                <div className="space-y-1">
-                  <span className="text-slate-500 block">Timeout</span>
-                  <span className="text-indigo-400 font-bold">{config.timeout > 0 ? `${config.timeout}s` : 'Défaut'}</span>
+          <div className="sticky top-24 space-y-8">
+            <section>
+              <h2 className="text-xl font-bold mb-6 flex items-center text-white">
+                <span className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-500 flex items-center justify-center mr-3 text-sm">04</span>
+                Commande Ansible
+              </h2>
+              <CommandDisplay config={config} />
+              <div className="mt-8 p-6 bg-slate-900/50 rounded-2xl border border-slate-800 space-y-4 shadow-xl">
+                <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-2">Résumé d'Exécution</h3>
+                <div className="grid grid-cols-2 gap-4 text-xs">
+                  <div className="space-y-1">
+                    <span className="text-slate-500 block">Environnement</span>
+                    <span className={`font-bold px-2 py-0.5 rounded text-white ${ENVIRONMENTS.find(e => e.value === config.environment)?.color}`}>{config.environment.toUpperCase()}</span>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-slate-500 block">Limit Target</span>
+                    <span className="text-amber-400 font-mono font-bold uppercase">{config.limit || 'ALL'}</span>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-slate-500 block">Vault Mode</span>
+                    <span className={`font-bold uppercase font-mono ${config.vaultPassword ? 'text-emerald-400' : 'text-rose-500'}`}>{config.vaultPassword ? 'PROTECTED (PWD)' : 'ASK-PASS'}</span>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-slate-500 block">Timeout</span>
+                    <span className="text-indigo-400 font-bold">{config.timeout > 0 ? `${config.timeout}s` : 'Défaut'}</span>
+                  </div>
                 </div>
               </div>
-            </div>
+            </section>
+
+            <section className="animate-in fade-in slide-in-from-right-4 duration-500">
+              <h2 className="text-xl font-bold mb-6 flex items-center text-white">
+                <span className="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-500 flex items-center justify-center mr-3 text-sm">05</span>
+                Accès Application
+              </h2>
+              <div className="bg-gradient-to-br from-indigo-900/40 to-slate-900 border border-indigo-500/30 p-6 rounded-2xl shadow-2xl relative group overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                   <span className="text-6xl">🌐</span>
+                </div>
+                <div className="relative z-10 space-y-4">
+                  <div>
+                    <h3 className="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-1">Frontend MORICE ({config.environment.toUpperCase()})</h3>
+                    <p className="text-[10px] text-slate-500 font-mono break-all">{currentFrontendUrl}</p>
+                  </div>
+                  <a 
+                    href={currentFrontendUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center space-x-3 w-full bg-gradient-to-r from-indigo-600 to-emerald-600 hover:from-indigo-500 hover:to-emerald-500 text-white py-3 rounded-xl font-bold uppercase tracking-widest text-xs transition-all shadow-lg shadow-indigo-500/20 active:scale-95"
+                  >
+                    <span>Ouvrir l'application</span>
+                    <span className="text-lg">↗</span>
+                  </a>
+                  <p className="text-[9px] text-slate-600 italic text-center">
+                    Note : Nécessite une authentification SSO Certilibre / ProxyMA active.
+                  </p>
+                </div>
+              </div>
+            </section>
           </div>
         </div>
       </main>

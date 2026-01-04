@@ -47,6 +47,7 @@ export interface DeploymentProject {
   name: string;
   icon: string;
   playbook: string;
+  description: string;
 }
 
 export interface SavedCommand {

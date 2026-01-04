@@ -47,25 +47,50 @@ const FRONTEND_LINKS: Record<string, string> = {
   prod: "https://mogend.sso.gendarmerie.fr"
 };
 
-const LabelTooltip: React.FC<{ text: string, children: React.ReactNode }> = ({ text, children }) => {
-  const [show, setShow] = useState(false);
+/**
+ * Composant Modal Informatif / Confirmation
+ */
+const HelpModal: React.FC<{ 
+  isOpen: boolean, 
+  onClose: () => void, 
+  title: string, 
+  description: string, 
+  icon?: string,
+  onConfirm?: () => void,
+  confirmLabel?: string
+}> = ({ isOpen, onClose, title, description, icon = "ℹ️", onConfirm, confirmLabel }) => {
+  if (!isOpen) return null;
   return (
-    <div className="relative inline-block group">
-      <div 
-        onMouseEnter={() => setShow(true)}
-        onMouseLeave={() => setShow(false)}
-        className="cursor-help"
-      >
-        {children}
-      </div>
-      {show && (
-        <div className="absolute z-[120] bottom-full left-0 mb-2 w-56 p-2 bg-slate-900 border border-slate-700 rounded shadow-2xl animate-in fade-in zoom-in-95 duration-150 pointer-events-none">
-          <p className="text-[10px] text-slate-300 leading-tight font-medium normal-case tracking-normal">
-            {text}
+    <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 animate-in fade-in duration-200">
+      <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-md" onClick={onClose} />
+      <div className="relative w-full max-w-sm bg-slate-900 border border-slate-700 rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+        <div className="p-8 text-center">
+          <div className="w-16 h-16 bg-indigo-500/10 rounded-2xl flex items-center justify-center text-3xl border border-indigo-500/20 mx-auto mb-6 shadow-inner">
+            {icon}
+          </div>
+          <h3 className="text-lg font-black text-white uppercase tracking-tight italic mb-4">{title}</h3>
+          <p className="text-xs text-slate-400 leading-relaxed mb-8">
+            {description}
           </p>
-          <div className="absolute top-full left-4 border-4 border-transparent border-t-slate-700"></div>
+          
+          <div className="space-y-3">
+            {onConfirm && (
+              <button 
+                onClick={() => { onConfirm(); onClose(); }}
+                className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-bold uppercase tracking-widest text-[10px] transition-all shadow-lg shadow-indigo-600/20 active:scale-95"
+              >
+                {confirmLabel || "Confirmer la sélection"}
+              </button>
+            )}
+            <button 
+              onClick={onClose}
+              className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-2xl text-[10px] font-bold uppercase tracking-widest transition-colors border border-slate-700"
+            >
+              {onConfirm ? "Annuler" : "J'ai compris"}
+            </button>
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };
@@ -77,33 +102,18 @@ interface PhaseButtonProps {
 }
 
 const PhaseButton: React.FC<PhaseButtonProps> = ({ phase, isActive, onClick }) => {
-  const [showTooltip, setShowTooltip] = useState(false);
-
   return (
-    <div className="relative group">
-      <button
-        onMouseEnter={() => setShowTooltip(true)}
-        onMouseLeave={() => setShowTooltip(false)}
-        onClick={onClick}
-        className={`w-full p-3 rounded-xl border flex items-center space-x-3 transition-all ${
-          isActive 
-          ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400 shadow-lg shadow-emerald-500/5' 
-          : 'bg-slate-800/50 border-slate-700 text-slate-400 hover:border-slate-500 hover:bg-slate-800'
-        }`}
-      >
-        <span className="text-xl">{phase.icon}</span>
-        <span className="text-[10px] font-bold uppercase text-left leading-tight">{phase.label}</span>
-      </button>
-      
-      {showTooltip && (
-        <div className="absolute z-[100] bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 border border-slate-700 rounded-lg shadow-2xl animate-in fade-in slide-in-from-bottom-2 duration-200 pointer-events-none">
-          <p className="text-[11px] text-slate-300 leading-relaxed font-medium">
-            {phase.description}
-          </p>
-          <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-slate-700"></div>
-        </div>
-      )}
-    </div>
+    <button
+      onClick={onClick}
+      className={`w-full p-4 rounded-xl border flex items-center space-x-3 transition-all relative group ${
+        isActive 
+        ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400 shadow-lg shadow-emerald-500/5' 
+        : 'bg-slate-800/50 border-slate-700 text-slate-400 hover:border-slate-500 hover:bg-slate-800'
+      }`}
+    >
+      <span className="text-xl group-hover:scale-110 transition-transform">{phase.icon}</span>
+      <span className="text-[10px] font-bold uppercase text-left leading-tight">{phase.label}</span>
+    </button>
   );
 };
 
@@ -114,38 +124,28 @@ interface TagBadgeProps {
 }
 
 const TagBadge: React.FC<TagBadgeProps> = ({ tag, isSelected, onClick }) => {
-  const [showTooltip, setShowTooltip] = useState(false);
-
   return (
-    <div className="relative inline-block">
-      <button
-        onMouseEnter={() => setShowTooltip(true)}
-        onMouseLeave={() => setShowTooltip(false)}
-        onClick={onClick}
-        className={`px-3 py-1 rounded-full text-[10px] font-mono border transition-all ${
-          isSelected
-          ? 'bg-indigo-600 border-indigo-400 text-white shadow-lg shadow-indigo-900/40'
-          : 'bg-slate-800 border-slate-700 text-slate-500 hover:text-slate-300 hover:border-slate-500'
-        }`}
-      >
-        {tag.id}
-      </button>
-      
-      {showTooltip && (
-        <div className="absolute z-[100] bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-900 border border-slate-700 rounded shadow-2xl animate-in fade-in zoom-in-95 duration-150 pointer-events-none">
-          <p className="text-[10px] text-slate-300 leading-tight">
-            {tag.description}
-          </p>
-          <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-700"></div>
-        </div>
-      )}
-    </div>
+    <button
+      onClick={onClick}
+      className={`px-4 py-2 rounded-full text-[10px] font-mono border transition-all hover:scale-105 active:scale-95 ${
+        isSelected
+        ? 'bg-indigo-600 border-indigo-400 text-white shadow-lg shadow-indigo-900/40'
+        : 'bg-slate-800 border-slate-700 text-slate-500 hover:text-slate-300 hover:border-slate-500'
+      }`}
+    >
+      {tag.id}
+    </button>
   );
 };
 
 export default function App() {
   const [config, setConfig] = useState<CommandConfig>(INITIAL_CONFIG);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  
+  // Modale d'aide contextuelle
+  const [helpData, setHelpData] = useState<{title: string, desc: string, icon?: string, onConfirm?: () => void, label?: string} | null>(null);
+
+  // Modales principales
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
   const [isReadmeModalOpen, setIsReadmeModalOpen] = useState(false);
   const [isArchiModalOpen, setIsArchiModalOpen] = useState(false);
@@ -159,11 +159,13 @@ export default function App() {
     setConfig(prev => ({ ...prev, ...updates }));
   };
 
-  const handlePhaseSelect = (phase: string) => {
+  const handlePhaseApply = (phase: string) => {
     let tags: string[] = [];
     if (phase === 'full_pipeline') {
+      // Tags exacts du script run.sh Case 7
       tags = ['copie', 'bootstrap', 'verif', 'phase_precheck', 'phase_install', 'phase_configuration', 'phase_frontend', 'phase_mcf', 'phase_services', 'phase_start', 'phase_post', 'nftables', 'lancement', 'phase_backup', 'logs'];
     } else if (phase === 'phase_deployment') {
+      // Tags exacts du script run.sh Case 9
       tags = ['verif', 'phase_precheck', 'phase_install', 'phase_configuration', 'phase_frontend', 'phase_mcf', 'phase_services', 'phase_start', 'phase_post', 'nftables', 'lancement', 'phase_backup', 'logs'];
     } else {
       tags = [phase];
@@ -178,11 +180,17 @@ export default function App() {
     updateConfig({ tags: newTags, phase: 'custom' });
   };
 
-  const handleDownloadRepo = () => {
-    window.open(REPO_DOWNLOAD_URL, '_blank');
-  };
-
   const currentFrontendUrl = FRONTEND_LINKS[config.environment] || FRONTEND_LINKS.qual;
+
+  const OptionHelpTrigger: React.FC<{ title: string, desc: string, icon?: string }> = ({ title, desc, icon }) => (
+    <button 
+      onClick={() => setHelpData({ title, desc, icon })}
+      className="ml-2 w-4 h-4 rounded-full bg-slate-800 text-slate-500 hover:bg-indigo-500 hover:text-white flex items-center justify-center text-[8px] font-bold border border-slate-700 transition-all active:scale-90"
+      title="Plus d'informations"
+    >
+      ?
+    </button>
+  );
 
   return (
     <div className="min-h-screen pb-20 bg-slate-950 text-slate-200">
@@ -195,6 +203,17 @@ export default function App() {
       <TechnicalReportModal isOpen={isRptModalOpen} onClose={() => setIsRptModalOpen(false)} initialEnv={config.environment} />
       <UsefulLinksModal isOpen={isUsefulLinksModalOpen} onClose={() => setIsUsefulLinksModalOpen(false)} />
       
+      {/* Help Context Modal */}
+      <HelpModal 
+        isOpen={!!helpData} 
+        onClose={() => setHelpData(null)} 
+        title={helpData?.title || ""} 
+        description={helpData?.desc || ""} 
+        icon={helpData?.icon}
+        onConfirm={helpData?.onConfirm}
+        confirmLabel={helpData?.label}
+      />
+
       <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -215,7 +234,7 @@ export default function App() {
                <span className="text-sm">🏗️</span>
                <span>Architecture</span>
              </button>
-             <button onClick={handleDownloadRepo} className="flex items-center space-x-2 text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest border border-slate-700 transition-all">
+             <button onClick={() => window.open(REPO_DOWNLOAD_URL, '_blank')} className="flex items-center space-x-2 text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest border border-slate-700 transition-all">
                <span className="text-sm">📥</span>
                <span>Ansible</span>
              </button>
@@ -252,12 +271,21 @@ export default function App() {
                 </div>
               </div>
               <div className="space-y-4">
-                <label className="text-sm font-semibold text-slate-400">Composant</label>
+                <label className="text-sm font-semibold text-slate-400 uppercase tracking-widest flex items-center">
+                  <span>Composant</span>
+                </label>
                 <div className="grid grid-cols-1 gap-2">
                   {PROJECTS.map(project => (
-                    <button key={project.id} onClick={() => updateConfig({ project: project.id })} className={`p-3 rounded-xl border text-left transition-all flex items-center space-x-3 ${config.project === project.id ? 'bg-indigo-500/10 border-indigo-500/50 text-indigo-400' : 'bg-slate-800/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}>
-                      <span className="text-xl">{project.icon}</span>
-                      <span className="font-medium text-sm">{project.name}</span>
+                    <button 
+                      key={project.id}
+                      onClick={() => {
+                        updateConfig({ project: project.id });
+                        setHelpData({ title: project.name, desc: project.description, icon: project.icon });
+                      }} 
+                      className={`w-full p-4 rounded-xl border text-left transition-all flex items-center space-x-3 group ${config.project === project.id ? 'bg-indigo-500/10 border-indigo-500/50 text-indigo-400' : 'bg-slate-800/50 border-slate-700 text-slate-400 hover:border-slate-500'}`}
+                    >
+                      <span className="text-xl group-hover:scale-110 transition-transform">{project.icon}</span>
+                      <span className="font-bold text-sm">{project.name}</span>
                     </button>
                   ))}
                 </div>
@@ -293,16 +321,37 @@ export default function App() {
             <div className="bg-slate-900/40 p-6 rounded-2xl border border-slate-800 space-y-8">
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {PHASES.map(phase => (
-                  <PhaseButton key={phase.value} phase={phase} isActive={config.phase === phase.value} onClick={() => handlePhaseSelect(phase.value)} />
+                  <PhaseButton 
+                    key={phase.value} 
+                    phase={phase} 
+                    isActive={config.phase === phase.value} 
+                    onClick={() => {
+                      setHelpData({ 
+                        title: phase.label, 
+                        desc: phase.description, 
+                        icon: phase.icon,
+                        label: "Sélectionner cette phase",
+                        onConfirm: () => handlePhaseApply(phase.value)
+                      });
+                    }}
+                  />
                 ))}
               </div>
               <div className="space-y-4">
-                <label className="text-sm font-semibold text-slate-400 uppercase tracking-widest flex justify-between">
-                  <span>Tags Spécifiques (Survol pour aide)</span>
+                <label className="text-sm font-semibold text-slate-400 uppercase tracking-widest flex justify-between items-center">
+                  <span>Tags Spécifiques</span>
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {SPECIFIC_TAGS.map(tag => (
-                    <TagBadge key={tag.id} tag={tag} isSelected={config.tags.includes(tag.id)} onClick={() => toggleSpecificTag(tag.id)} />
+                    <TagBadge 
+                      key={tag.id} 
+                      tag={tag} 
+                      isSelected={config.tags.includes(tag.id)} 
+                      onClick={() => {
+                        toggleSpecificTag(tag.id);
+                        setHelpData({ title: tag.id, desc: tag.description, icon: "🏷️" });
+                      }} 
+                    />
                   ))}
                 </div>
               </div>
@@ -319,58 +368,43 @@ export default function App() {
                <div className="space-y-8 bg-indigo-950/20 p-8 rounded-3xl border border-indigo-500/20 animate-in fade-in slide-in-from-top-4 duration-300">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <LabelTooltip text="Mot de passe chiffré permettant de déverrouiller les variables sensibles stockées dans group_vars/all.yml.">
-                        <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center hover:text-rose-400 transition-colors">
+                      <div className="flex items-center">
+                        <span className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
                           <span className="mr-2">🔐</span> Vault Password
-                        </label>
-                      </LabelTooltip>
+                        </span>
+                        <OptionHelpTrigger title="Vault Password" desc="Mot de passe chiffré permettant de déverrouiller les variables sensibles stockées dans group_vars/all.yml." icon="🔐" />
+                      </div>
                       <input type="password" value={config.vaultPassword} onChange={(e) => updateConfig({ vaultPassword: e.target.value })} placeholder="••••••••••••" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-rose-400 font-mono focus:ring-1 focus:ring-rose-500 outline-none transition-all" />
                     </div>
                     <div className="space-y-2">
-                      <LabelTooltip text="L'utilisateur SSH utilisé pour se connecter aux machines distantes (ex: debian, root, datafari).">
-                        <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center hover:text-indigo-400 transition-colors">
+                      <div className="flex items-center">
+                        <span className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
                           <span className="mr-2">👤</span> Remote User (-u)
-                        </label>
-                      </LabelTooltip>
+                        </span>
+                        <OptionHelpTrigger title="Remote User" desc="L'utilisateur SSH utilisé pour se connecter aux machines distantes (ex: debian, root, datafari)." icon="👤" />
+                      </div>
                       <input type="text" value={config.remoteUser} onChange={(e) => updateConfig({ remoteUser: e.target.value })} placeholder="ex: datafari" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:ring-1 focus:ring-indigo-500 outline-none" />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <LabelTooltip text="Reprend l'exécution du playbook à partir du nom exact d'une tâche (utile après une erreur corrigée).">
-                        <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center hover:text-emerald-400 transition-colors">
+                      <div className="flex items-center">
+                        <span className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
                           <span className="mr-2">🏁</span> Start at Task
-                        </label>
-                      </LabelTooltip>
+                        </span>
+                        <OptionHelpTrigger title="Start at Task" desc="Reprend l'exécution du playbook à partir du nom exact d'une tâche (utile après une erreur corrigée)." icon="🏁" />
+                      </div>
                       <input type="text" value={config.startAtTask} onChange={(e) => updateConfig({ startAtTask: e.target.value })} placeholder="Nom exact de la tâche..." className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-emerald-400 font-mono focus:ring-1 focus:ring-indigo-500 outline-none" />
                     </div>
                     <div className="space-y-2">
-                      <LabelTooltip text="Injection de variables supplémentaires à la volée au format clé=valeur (ex: version=1.2.3).">
-                        <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center hover:text-amber-400 transition-colors">
+                      <div className="flex items-center">
+                        <span className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
                           <span className="mr-2">➕</span> Extra Vars (-e)
-                        </label>
-                      </LabelTooltip>
+                        </span>
+                        <OptionHelpTrigger title="Extra Vars" desc="Injection de variables supplémentaires à la volée au format clé=valeur (ex: version=1.2.3)." icon="➕" />
+                      </div>
                       <input type="text" value={config.extraVarsRaw} onChange={(e) => updateConfig({ extraVarsRaw: e.target.value })} placeholder="key1=val1 key2=val2" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-amber-400 font-mono focus:ring-1 focus:ring-amber-500 outline-none" />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <LabelTooltip text="Nombre de processus parallèles. Augmente la vitesse de déploiement sur plusieurs nœuds.">
-                        <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center hover:text-indigo-400 transition-colors">
-                          Forks (-f)
-                        </label>
-                      </LabelTooltip>
-                      <input type="number" value={config.forks || ''} onChange={(e) => updateConfig({ forks: parseInt(e.target.value) || 0 })} placeholder="0 (Auto)" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2 text-sm text-slate-200 focus:ring-1 focus:ring-indigo-500 outline-none" />
-                    </div>
-                    <div className="space-y-2">
-                      <LabelTooltip text="Délai maximum d'attente pour la réponse SSH avant de considérer l'hôte comme injoignable.">
-                        <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center hover:text-indigo-400 transition-colors">
-                          SSH Timeout (s)
-                        </label>
-                      </LabelTooltip>
-                      <input type="number" value={config.timeout || ''} onChange={(e) => updateConfig({ timeout: parseInt(e.target.value) || 0 })} placeholder="Par défaut (10s)" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2 text-sm text-slate-200 focus:ring-1 focus:ring-indigo-500 outline-none" />
                     </div>
                   </div>
 
@@ -383,18 +417,22 @@ export default function App() {
                       { label: "Syntax Check", key: "syntaxCheck", color: "bg-slate-600", help: "Vérifie la syntaxe YAML sans contacter les serveurs." },
                       { label: "List Tasks", key: "listTasks", color: "bg-slate-600", help: "Affiche simplement la liste des tâches ordonnées." },
                     ].map((toggle) => (
-                      <div key={toggle.key} className="flex flex-col">
+                      <div key={toggle.key} className="flex flex-col space-y-1">
                         <label className="flex items-center space-x-3 cursor-pointer group">
                           <div className={`w-10 h-5 rounded-full transition-all relative ${config[toggle.key as keyof CommandConfig] ? toggle.color : 'bg-slate-700'}`}>
                             <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${config[toggle.key as keyof CommandConfig] ? 'left-5.5' : 'left-0.5'}`} />
                           </div>
                           <input type="checkbox" className="hidden" checked={!!config[toggle.key as keyof CommandConfig]} onChange={() => updateConfig({ [toggle.key]: !config[toggle.key as keyof CommandConfig] })} />
-                          <LabelTooltip text={toggle.help}>
-                            <span className="text-[10px] font-bold text-slate-400 group-hover:text-slate-200 transition-colors uppercase tracking-widest flex items-center">
-                              {toggle.label}
-                            </span>
-                          </LabelTooltip>
+                          <span className="text-[10px] font-bold text-slate-400 group-hover:text-slate-200 transition-colors uppercase tracking-widest flex items-center">
+                            {toggle.label}
+                          </span>
                         </label>
+                        <button 
+                          onClick={() => setHelpData({ title: toggle.label, desc: toggle.help, icon: "⚙️" })}
+                          className="text-[8px] text-slate-600 hover:text-indigo-400 transition-colors uppercase text-left w-fit border-b border-dotted border-slate-800"
+                        >
+                          Détails
+                        </button>
                       </div>
                     ))}
                   </div>

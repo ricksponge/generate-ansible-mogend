@@ -14,11 +14,41 @@ export interface TagConfig {
 }
 
 export const PROJECTS: DeploymentProject[] = [
-  { id: 'datafari-core', name: 'Datafari Core', icon: '🔍', playbook: 'install.yml' },
-  { id: 'frontend-ui', name: 'Frontend MORICE', icon: '🎨', playbook: 'install.yml' },
-  { id: 'solr-engine', name: 'Solr Search', icon: '⚡', playbook: 'install.yml' },
-  { id: 'mcf-connector', name: 'MCF Connectors', icon: '🔗', playbook: 'install.yml' },
-  { id: 'apache-sso', name: 'Apache & SSO', icon: '🔐', playbook: 'install.yml' },
+  { 
+    id: 'datafari-core', 
+    name: 'Datafari Core', 
+    icon: '🔍', 
+    playbook: 'install.yml',
+    description: 'Socle central incluant Tomcat, Cassandra et l\'API. Pilote l\'indexation et la recherche.'
+  },
+  { 
+    id: 'frontend-ui', 
+    name: 'Frontend MORICE', 
+    icon: '🎨', 
+    playbook: 'install.yml',
+    description: 'Interface utilisateur web (UI). Gère le rendu visuel, les JSP et l\'expérience de recherche.'
+  },
+  { 
+    id: 'solr-engine', 
+    name: 'Solr Search', 
+    icon: '⚡', 
+    playbook: 'install.yml',
+    description: 'Moteur de recherche SolrCloud. Stocke l\'index inversé et traite les requêtes de recherche.'
+  },
+  { 
+    id: 'mcf-connector', 
+    name: 'MCF Connectors', 
+    icon: '🔗', 
+    playbook: 'install.yml',
+    description: 'ManifoldCF. Orchestre la collecte (crawl) des données depuis les sources (NFS, SharePoint, Web).'
+  },
+  { 
+    id: 'apache-sso', 
+    name: 'Apache & SSO', 
+    icon: '🔐', 
+    playbook: 'install.yml',
+    description: 'Point d\'entrée sécurisé. Gère le raccordement SSO (ProxyMA/Certilibre) et la terminaison TLS.'
+  },
 ];
 
 export const ENVIRONMENTS = [

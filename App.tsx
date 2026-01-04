@@ -6,6 +6,9 @@ import CommandDisplay from './components/CommandDisplay';
 import AnsibleConfigModal from './components/AnsibleConfigModal';
 import ReadmeModal from './components/ReadmeModal';
 import ArchitectureModal from './components/ArchitectureModal';
+import ProjectInfoModal from './components/ProjectInfoModal';
+import UserGuideModal from './components/UserGuideModal';
+import MaintenanceScriptsModal from './components/MaintenanceScriptsModal';
 
 const INITIAL_CONFIG: CommandConfig = {
   project: PROJECTS[0].id,
@@ -107,6 +110,9 @@ export default function App() {
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
   const [isReadmeModalOpen, setIsReadmeModalOpen] = useState(false);
   const [isArchiModalOpen, setIsArchiModalOpen] = useState(false);
+  const [isProjectInfoModalOpen, setIsProjectInfoModalOpen] = useState(false);
+  const [isUserGuideModalOpen, setIsUserGuideModalOpen] = useState(false);
+  const [isMaintenanceModalOpen, setIsMaintenanceModalOpen] = useState(false);
 
   const updateConfig = (updates: Partial<CommandConfig>) => {
     setConfig(prev => ({ ...prev, ...updates }));
@@ -146,6 +152,9 @@ export default function App() {
       <AnsibleConfigModal isOpen={isConfigModalOpen} onClose={() => setIsConfigModalOpen(false)} />
       <ReadmeModal isOpen={isReadmeModalOpen} onClose={() => setIsReadmeModalOpen(false)} />
       <ArchitectureModal isOpen={isArchiModalOpen} onClose={() => setIsArchiModalOpen(false)} />
+      <ProjectInfoModal isOpen={isProjectInfoModalOpen} onClose={() => setIsProjectInfoModalOpen(false)} />
+      <UserGuideModal isOpen={isUserGuideModalOpen} onClose={() => setIsUserGuideModalOpen(false)} />
+      <MaintenanceScriptsModal isOpen={isMaintenanceModalOpen} onClose={() => setIsMaintenanceModalOpen(false)} />
       
       {/* Header */}
       <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
@@ -427,9 +436,32 @@ export default function App() {
       <footer className="mt-20 border-t border-slate-800 py-12 bg-slate-950/50">
          <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-[10px] text-slate-600 font-mono uppercase tracking-widest">
             <p>© 2025 MOGEND Command Forge — SPWSI / M472</p>
-            <div className="flex space-x-8 mt-4 md:mt-0">
-               <span className="flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-2"></span> System Ready</span>
-               <span className="flex items-center font-bold text-slate-400 italic">Plateforme MORICE / Datafari</span>
+            <div className="flex flex-wrap justify-center gap-4 mt-4 md:mt-0">
+               <button 
+                 onClick={() => setIsMaintenanceModalOpen(true)}
+                 className="flex items-center space-x-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 px-4 py-2 rounded-xl border border-amber-500/30 transition-all font-bold uppercase tracking-widest text-[9px]"
+               >
+                 <span>🛠️</span>
+                 <span>Scripts Maintenance</span>
+               </button>
+               <button 
+                 onClick={() => setIsUserGuideModalOpen(true)}
+                 className="flex items-center space-x-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 px-4 py-2 rounded-xl border border-emerald-500/30 transition-all font-bold uppercase tracking-widest text-[9px]"
+               >
+                 <span>📙</span>
+                 <span>Guide Utilisateur</span>
+               </button>
+               <button 
+                 onClick={() => setIsProjectInfoModalOpen(true)}
+                 className="flex items-center space-x-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 px-4 py-2 rounded-xl border border-indigo-500/30 transition-all font-bold uppercase tracking-widest text-[9px]"
+               >
+                 <span>📊</span>
+                 <span>Présentation Projet</span>
+               </button>
+               <div className="flex items-center space-x-8 px-4">
+                 <span className="flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-2"></span> System Ready</span>
+                 <span className="flex items-center font-bold text-slate-400 italic">Plateforme MORICE / Datafari</span>
+               </div>
             </div>
          </div>
       </footer>

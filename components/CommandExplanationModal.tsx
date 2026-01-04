@@ -1,7 +1,7 @@
 
 import React, { useEffect } from 'react';
 import { CommandConfig } from '../types';
-import { SPECIFIC_TAGS, ENVIRONMENTS, PROJECTS } from '../constants';
+import { SPECIFIC_TAGS, ENVIRONMENTS } from '../constants';
 
 interface CommandExplanationModalProps {
   isOpen: boolean;
@@ -23,9 +23,8 @@ const CommandExplanationModal: React.FC<CommandExplanationModalProps> = ({ isOpe
   if (!isOpen) return null;
 
   const currentEnv = ENVIRONMENTS.find(e => e.value === config.environment);
-  const currentProject = PROJECTS.find(p => p.id === config.project);
   
-  // Mapping strict basé sur les tags réellement présents dans la config (ceux envoyés à la commande)
+  // Mapping strict basé sur les tags réellement présents dans la config
   const selectedTagsInfo = config.tags.map(tagId => {
     const found = SPECIFIC_TAGS.find(t => t.id === tagId);
     return found || { id: tagId, description: "Tag système ou personnalisé sans description enregistrée." };
@@ -69,14 +68,7 @@ const CommandExplanationModal: React.FC<CommandExplanationModalProps> = ({ isOpe
         <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-8 custom-scrollbar bg-slate-950/30">
           
           {/* SYNTHÈSE RAPIDE */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-            <div className="p-3 sm:p-4 bg-slate-900 border border-slate-800 rounded-xl sm:rounded-2xl">
-              <span className="text-[8px] sm:text-[9px] font-bold text-slate-500 uppercase tracking-widest block mb-1 sm:mb-2">Composant</span>
-              <div className="flex items-center space-x-2">
-                <span className="text-base sm:text-lg">{currentProject?.icon}</span>
-                <span className="text-white font-bold text-xs sm:text-sm truncate">{currentProject?.name}</span>
-              </div>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div className="p-3 sm:p-4 bg-slate-900 border border-slate-800 rounded-xl sm:rounded-2xl">
               <span className="text-[8px] sm:text-[9px] font-bold text-slate-500 uppercase tracking-widest block mb-1 sm:mb-2">Environnement</span>
               <div className="flex items-center space-x-2">
@@ -85,7 +77,7 @@ const CommandExplanationModal: React.FC<CommandExplanationModalProps> = ({ isOpe
               </div>
             </div>
             <div className="p-3 sm:p-4 bg-slate-900 border border-slate-800 rounded-xl sm:rounded-2xl border-l-amber-500/50">
-              <span className="text-[8px] sm:text-[9px] font-bold text-slate-500 uppercase tracking-widest block mb-1 sm:mb-2">Target Limit</span>
+              <span className="text-[8px] sm:text-[9px] font-bold text-slate-500 uppercase tracking-widest block mb-1 sm:mb-2">Target Limit (Machines)</span>
               <span className="text-amber-400 font-mono font-bold text-xs sm:text-sm tracking-tight truncate">{config.limit || 'all'}</span>
             </div>
           </div>
@@ -168,12 +160,12 @@ const CommandExplanationModal: React.FC<CommandExplanationModalProps> = ({ isOpe
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-8 sm:gap-x-12">
               {[
-                { label: "Playbook source", value: currentProject?.playbook, isCode: true },
-                { label: "Inventaire", value: `inventories/${config.environment}/`, isCode: true },
+                { label: "Inventaire source", value: `inventories/${config.environment}/`, isCode: true },
                 { label: "Mode d'exécution", value: config.checkMode ? 'Simulation (--check)' : 'Application directe', highlight: config.checkMode ? 'text-amber-500' : 'text-emerald-500' },
                 { label: "Gestion des Secrets", value: config.vaultPassword ? 'Vault Pass File' : 'Ask-Pass (Prompt)', highlight: config.vaultPassword ? 'text-emerald-500' : 'text-rose-500' },
                 { label: "SSH Strategy", value: "Linear / Pipelining", highlight: 'text-slate-300' },
-                { label: "Utilisateur", value: config.remoteUser || 'System Default', highlight: 'text-indigo-400', isCode: true },
+                { label: "Utilisateur distant", value: config.remoteUser || 'System Default', highlight: 'text-indigo-400', isCode: true },
+                { label: "Timeout SSH", value: config.timeout > 0 ? `${config.timeout}s` : 'Défaut', highlight: 'text-slate-300' },
               ].map((item, i) => (
                 <div key={i} className="flex justify-between items-center text-[10px] sm:text-[11px] border-b border-slate-800/50 pb-1.5">
                   <span className="text-slate-500 font-medium">{item.label}</span>

@@ -12,6 +12,7 @@ import MaintenanceScriptsModal from './components/MaintenanceScriptsModal';
 import TechnicalReportModal from './components/TechnicalReportModal';
 import UsefulLinksModal from './components/UsefulLinksModal';
 import EasterEggModal from './components/EasterEggModal';
+import LandingScreen from './components/LandingScreen';
 
 const INITIAL_CONFIG: CommandConfig = {
   project: PROJECTS[0].id,
@@ -50,6 +51,7 @@ const FRONTEND_LINKS: Record<string, string> = {
 };
 
 export default function App() {
+  const [hasEntered, setHasEntered] = useState(false);
   const [config, setConfig] = useState<CommandConfig>(INITIAL_CONFIG);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [hoverDetail, setHoverDetail] = useState<{title: string, desc: string, icon: string} | null>(null);
@@ -128,8 +130,12 @@ export default function App() {
   // Classe CSS commune pour les boutons Action Card
   const actionButtonClass = "flex items-center space-x-3 px-5 py-3 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-2xl transition-all group shrink-0 shadow-sm hover:shadow-indigo-500/10 active:scale-95";
 
+  if (!hasEntered) {
+    return <LandingScreen onEnter={() => setHasEntered(true)} />;
+  }
+
   return (
-    <div className="min-h-screen pb-40 bg-slate-950 text-slate-200 selection:bg-indigo-500/30">
+    <div className="min-h-screen pb-40 bg-[#020617] text-slate-200 selection:bg-indigo-500/30 animate-in fade-in duration-1000">
       <style>{`
         @keyframes shimmer {
           0% { transform: translateX(-150%) skewX(-20deg); }

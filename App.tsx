@@ -5,6 +5,7 @@ import { PROJECTS, ENVIRONMENTS, PHASES, SPECIFIC_TAGS, COMMON_GROUPS } from './
 import CommandDisplay from './components/CommandDisplay';
 import AnsibleConfigModal from './components/AnsibleConfigModal';
 import ReadmeModal from './components/ReadmeModal';
+import ArchitectureModal from './components/ArchitectureModal';
 
 const INITIAL_CONFIG: CommandConfig = {
   project: PROJECTS[0].id,
@@ -105,6 +106,7 @@ export default function App() {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
   const [isReadmeModalOpen, setIsReadmeModalOpen] = useState(false);
+  const [isArchiModalOpen, setIsArchiModalOpen] = useState(false);
 
   const updateConfig = (updates: Partial<CommandConfig>) => {
     setConfig(prev => ({ ...prev, ...updates }));
@@ -143,6 +145,7 @@ export default function App() {
     <div className="min-h-screen pb-20 bg-slate-950 text-slate-200">
       <AnsibleConfigModal isOpen={isConfigModalOpen} onClose={() => setIsConfigModalOpen(false)} />
       <ReadmeModal isOpen={isReadmeModalOpen} onClose={() => setIsReadmeModalOpen(false)} />
+      <ArchitectureModal isOpen={isArchiModalOpen} onClose={() => setIsArchiModalOpen(false)} />
       
       {/* Header */}
       <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
@@ -157,6 +160,13 @@ export default function App() {
             </div>
           </div>
           <div className="flex items-center space-x-3">
+             <button 
+               onClick={() => setIsArchiModalOpen(true)}
+               className="group flex items-center space-x-2 text-[10px] bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest border border-indigo-500/30 transition-all"
+             >
+               <span className="text-sm">🏗️</span>
+               <span>Architecture</span>
+             </button>
              <button 
                onClick={handleDownloadRepo}
                className="group flex items-center space-x-2 text-[10px] bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest border border-emerald-500/30 transition-all"
@@ -173,11 +183,11 @@ export default function App() {
              </button>
              <button 
                onClick={() => setIsConfigModalOpen(true)}
-               className="text-[10px] bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest border border-indigo-500/30 transition-all"
+               className="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest border border-slate-700 transition-all"
              >
                Ansible CFG
              </button>
-             <span className="text-[10px] bg-slate-800 text-slate-400 px-2 py-1.5 rounded-lg font-mono border border-slate-700">v3.4</span>
+             <span className="text-[10px] bg-slate-800 text-slate-400 px-2 py-1.5 rounded-lg font-mono border border-slate-700">v3.5</span>
           </div>
         </div>
       </header>

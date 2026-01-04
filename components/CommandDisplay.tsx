@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { CommandConfig } from '../types';
 import CommandExplanationModal from './CommandExplanationModal';
+import TerminalCopyModal from './TerminalCopyModal';
 
 interface CommandDisplayProps {
   config: CommandConfig;
@@ -10,6 +11,7 @@ interface CommandDisplayProps {
 const CommandDisplay: React.FC<CommandDisplayProps> = ({ config }) => {
   const [copied, setCopied] = useState(false);
   const [isExplanationOpen, setIsExplanationOpen] = useState(false);
+  const [isTerminalModalOpen, setIsTerminalModalOpen] = useState(false);
 
   const generateCommand = () => {
     // According to M472 script logic
@@ -82,6 +84,7 @@ const CommandDisplay: React.FC<CommandDisplayProps> = ({ config }) => {
   const handleCopy = () => {
     navigator.clipboard.writeText(command);
     setCopied(true);
+    setIsTerminalModalOpen(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -91,6 +94,12 @@ const CommandDisplay: React.FC<CommandDisplayProps> = ({ config }) => {
         isOpen={isExplanationOpen} 
         onClose={() => setIsExplanationOpen(false)} 
         config={config} 
+      />
+
+      <TerminalCopyModal
+        isOpen={isTerminalModalOpen}
+        onClose={() => setIsTerminalModalOpen(false)}
+        command={command}
       />
       
       <div className="bg-slate-950 border border-slate-700 rounded-xl overflow-hidden shadow-2xl transition-all duration-300">
@@ -111,7 +120,7 @@ const CommandDisplay: React.FC<CommandDisplayProps> = ({ config }) => {
             <button
               onClick={handleCopy}
               className={`px-3 py-1 rounded text-[10px] font-bold uppercase transition-colors ${
-                copied ? 'bg-emerald-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                copied ? 'bg-emerald-600 text-white shadow-lg' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
               }`}
             >
               {copied ? 'Copié' : 'Copier'}

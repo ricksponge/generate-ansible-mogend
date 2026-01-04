@@ -35,7 +35,8 @@ const INITIAL_CONFIG: CommandConfig = {
   listTags: false,
   timeout: 0,
   vaultPassword: '',
-  phase: 'phase_precheck'
+  phase: 'phase_precheck',
+  useMogendHome: true
 };
 
 const REPO_DOWNLOAD_URL = "https://omnibus-pic.gendarmerie.fr/spwsi/morice2/deploiement/-/archive/dev_lommere/deploiement-dev_lommere.tar.gz";
@@ -364,7 +365,19 @@ export default function App() {
                 <span className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-500 flex items-center justify-center mr-3 text-sm">04</span>
                 Commande Ansible
               </h2>
-              <CommandDisplay config={config} />
+              <div className="space-y-4">
+                 <div className="flex items-center justify-between px-2">
+                    <label className="flex items-center space-x-3 cursor-pointer group">
+                      <div className={`w-8 h-4 rounded-full transition-all relative ${config.useMogendHome ? 'bg-indigo-600' : 'bg-slate-700'}`}>
+                        <div className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-all ${config.useMogendHome ? 'left-4.5' : 'left-0.5'}`} />
+                      </div>
+                      <input type="checkbox" className="hidden" checked={!!config.useMogendHome} onChange={() => updateConfig({ useMogendHome: !config.useMogendHome })} />
+                      <span className="text-[10px] font-bold text-slate-500 group-hover:text-indigo-400 transition-colors uppercase tracking-widest">Inclure cd "$MOGEND_HOME"</span>
+                    </label>
+                 </div>
+                 <CommandDisplay config={config} />
+              </div>
+
               <div className="mt-8 p-6 bg-slate-900/50 rounded-2xl border border-slate-800 space-y-4 shadow-xl">
                 <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-2">Résumé d'Exécution</h3>
                 <div className="grid grid-cols-2 gap-4 text-xs">

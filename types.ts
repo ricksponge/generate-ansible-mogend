@@ -39,6 +39,7 @@ export interface CommandConfig {
   vaultPassword?: string;
   // M472 Specifics
   phase?: string;
+  useMogendHome?: boolean;
 }
 
 export interface DeploymentProject {

@@ -41,6 +41,7 @@ const INITIAL_CONFIG: CommandConfig = {
 };
 
 const REPO_DOWNLOAD_URL = "https://omnibus-pic.gendarmerie.fr/spwsi/morice2/deploiement/-/archive/dev_lommere/deploiement-dev_lommere.tar.gz";
+const BINARY_DOWNLOAD_URL = "https://nextcloud.francelabs.com/s/5Zw9JHriqoXeZLn";
 
 const FRONTEND_LINKS: Record<string, string> = {
   qual: "https://morice-qual.ppsso.gendarmerie.fr",
@@ -188,6 +189,14 @@ export default function App() {
                <div className="text-left">
                  <div className="text-[10px] font-black text-white uppercase tracking-tighter italic">Architecture</div>
                  <div className="text-[8px] text-slate-500 uppercase tracking-widest font-mono">Flux & Infra</div>
+               </div>
+             </button>
+
+             <button onClick={() => window.open(BINARY_DOWNLOAD_URL, '_blank')} className={actionButtonClass}>
+               <span className="text-2xl group-hover:scale-110 transition-transform">📦</span>
+               <div className="text-left">
+                 <div className="text-[10px] font-black text-white uppercase tracking-tighter italic">Binaire Datafari</div>
+                 <div className="text-[8px] text-slate-500 uppercase tracking-widest font-mono">Paquet .deb / v6</div>
                </div>
              </button>
 
@@ -405,21 +414,21 @@ export default function App() {
                   </label>
                 </div>
 
-                {/* Bloc 3: Variables & Reprise (Plein largeur possible ou 2 colonnes) */}
+                {/* Bloc 3: Variables & Reprise */}
                 <div className="md:col-span-2 bg-slate-900/40 p-6 rounded-2xl border border-slate-800 space-y-6 shadow-xl">
                   <h3 className="text-[10px] font-black text-amber-400 uppercase tracking-[0.2em] border-b border-slate-800 pb-2">Secrets & Reprise</h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
                       <label className="text-[9px] font-black text-slate-500 uppercase mb-1 block">Mot de passe Vault</label>
-                      <input type="password" value={config.vaultPassword} onChange={(e) => updateConfig({ vaultPassword: e.target.value })} placeholder="••••••••" className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-emerald-400 font-mono" />
+                      <input type="password" value={config.vaultPassword} onChange={(e) => updateConfig({ vaultPassword: e.target.value })} placeholder="••••••••" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-emerald-400 font-mono" />
                     </div>
                     <div>
                       <label className="text-[9px] font-black text-slate-500 uppercase mb-1 block">Extra Vars (-e)</label>
-                      <input type="text" value={config.extraVarsRaw} onChange={(e) => updateConfig({ extraVarsRaw: e.target.value })} placeholder="Ex: force=yes" className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-amber-500 font-mono" />
+                      <input type="text" value={config.extraVarsRaw} onChange={(e) => updateConfig({ extraVarsRaw: e.target.value })} placeholder="Ex: force=yes" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-amber-500 font-mono" />
                     </div>
                     <div>
                       <label className="text-[9px] font-black text-slate-500 uppercase mb-1 block">Reprendre à la tâche</label>
-                      <input type="text" value={config.startAtTask} onChange={(e) => updateConfig({ startAtTask: e.target.value })} placeholder="Ex: restart tomcat" className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white font-mono" />
+                      <input type="text" value={config.startAtTask} onChange={(e) => updateConfig({ startAtTask: e.target.value })} placeholder="Ex: restart tomcat" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white font-mono" />
                     </div>
                   </div>
                 </div>
